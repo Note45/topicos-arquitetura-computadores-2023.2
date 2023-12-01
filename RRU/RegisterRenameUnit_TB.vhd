@@ -61,7 +61,7 @@ BEGIN
     BEGIN
         WAIT FOR clock_period/2;
         clock_tb <= NOT clock_tb;
-        ASSERT NOW < 30 ns REPORT "Fim" SEVERITY FAILURE;
+        ASSERT NOW < 50 ns REPORT "Fim" SEVERITY FAILURE;
     END PROCESS;
 
     RRU : RegisterRenameUnit
@@ -95,7 +95,7 @@ BEGIN
     BEGIN
 
         --                                                 Instante 1                                                 --
-        --                           Teste: execucao de duas instrucoes em ordem (fluxo principal)
+        --                       Teste: execucao de duas instrucoes tipo R em ordem (fluxo principal)
         -- Instrucao 1) add x5 x14 x26
         -- x5 <= x26 + x14
         -- TipoR = funct7 rs2 rs1 funct3 rd codop
@@ -155,18 +155,18 @@ BEGIN
         inst_1_tb <= "00000011111110010000010000110011";
         WAIT FOR 5 ns;
 
-        ASSERT (inst_side_s_0_tb /= "00000000000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_S_0 correto!" SEVERITY NOTE;
-        ASSERT (inst_side_t_0_tb /= "00000100000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_T_0 correto!" SEVERITY NOTE;
-        ASSERT (inst_tag_rrf_dest_0_tb /= "00010") REPORT "Instante 1 - Inst_Tag_RRF_Dest_0 correto!" SEVERITY NOTE;
+        ASSERT (inst_side_s_0_tb = "00000000000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_S_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_side_t_0_tb = "00000100000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_T_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_tag_rrf_dest_0_tb = "00010") REPORT "Instante 1 - Inst_Tag_RRF_Dest_0 incorreto!" SEVERITY FAILURE;
 
-        ASSERT (inst_side_s_1_tb /= "00001100000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_S_1 correto!" SEVERITY NOTE;
-        ASSERT (inst_side_t_1_tb /= "00010000000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_T_1 correto!" SEVERITY NOTE;
-        ASSERT (inst_tag_rrf_dest_1_tb /= "00101") REPORT "Instante 1 - Inst_Tag_RRF_Dest_1 correto!" SEVERITY NOTE;
+        ASSERT (inst_side_s_1_tb = "00001100000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_S_1 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_side_t_1_tb = "00010000000000000000000000000000000000") REPORT "Instante 1 - Inst_Side_T_1 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_tag_rrf_dest_1_tb = "00101") REPORT "Instante 1 - Inst_Tag_RRF_Dest_1 incorreto!" SEVERITY FAILURE;
 
 
 
         --                                                 Instante 2                                                 --
-        --                                   Teste: permutabilidade das instrucoes
+        --                       Teste: permutabilidade das instrucoes e multiplo renome
         -- Instrucao 4) xor x20 x14 x7
         -- x20 <= x14 xor x7
         -- TipoR = funct7 rs2 rs1 funct3 rd codop
@@ -187,7 +187,7 @@ BEGIN
         --
         --          Inst_Side_T_0: 00101000000000000000000000000000000000
         --                      Inst_Side_T_0(37):           0 (use o ARF_DATA)
-        --                      Inst_Side_T_0(36 DOWNTO 32): 01010 (10 = RRF(10) = renome do x14)
+        --                      Inst_Side_T_0(36 DOWNTO 32): 01010 (10 = RRF(10) = segundo renome do x14)
         --                      Inst_Side_T_0(31 DOWNTO 0):  00000000000000000000000000000000 (ARF_DATA do x14)
         --
         --          Inst_Tag_RRF_Dest_0: 01011
@@ -218,24 +218,24 @@ BEGIN
         --
         --          Inst_Tag_RRF_Dest_1: 01000
         --                      Inst_Tag_RRF_Dest_1: (8 = RRF(8) = renome do x16)
-        ic_1_tb <= to_unsigned(2, 33);
-        inst_1_tb <= "00000000011101110100101000110011";
         ic_0_tb <= to_unsigned(3, 33);
-        inst_0_tb <= "01000000000100011000100000110011";
+        inst_0_tb <= "00000000011101110100101000110011";
+        ic_1_tb <= to_unsigned(2, 33);
+        inst_1_tb <= "01000000000100011000100000110011";
         WAIT FOR 5 ns;
 
-        ASSERT (inst_side_s_0_tb /= "00100100000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_S_0 correto!" SEVERITY NOTE;
-        ASSERT (inst_side_t_0_tb /= "00101000000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_T_0 correto!" SEVERITY NOTE;
-        ASSERT (inst_tag_rrf_dest_0_tb /= "01011") REPORT "Instante 2 - Inst_Tag_RRF_Dest_0 correto!" SEVERITY NOTE;
+        ASSERT (inst_side_s_0_tb = "00100100000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_S_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_side_t_0_tb = "00101000000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_T_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_tag_rrf_dest_0_tb = "01011") REPORT "Instante 2 - Inst_Tag_RRF_Dest_0 incorreto!" SEVERITY FAILURE;
 
-        ASSERT (inst_side_s_1_tb /= "00011000000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_S_1 correto!" SEVERITY NOTE;
-        ASSERT (inst_side_t_1_tb /= "00011100000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_T_1 correto!" SEVERITY NOTE;
-        ASSERT (inst_tag_rrf_dest_1_tb /= "01000") REPORT "Instante 2 - Inst_Tag_RRF_Dest_1 correto!" SEVERITY NOTE;
+        ASSERT (inst_side_s_1_tb = "00011000000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_S_1 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_side_t_1_tb = "00011100000000000000000000000000000000") REPORT "Instante 2 - Inst_Side_T_1 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_tag_rrf_dest_1_tb = "01000") REPORT "Instante 2 - Inst_Tag_RRF_Dest_1 incorreto!" SEVERITY FAILURE;
 
 
 
         --                                                 Instante 3                                                 --
-        --                               Teste: recebimento de instrucao fora da ordem
+        --                             Teste: nao recebimento de instrucao fora da ordem
         -- Instrucao 9) add x5 x14 x26
         -- x5 <= x26 + x14
         -- TipoR = funct7 rs2 rs1 funct3 rd codop
@@ -249,42 +249,106 @@ BEGIN
         --                      rd:     00101   (x5)
         --                      codop:  0110011 (tipo R)
         -- Outputs esperados:
-        --          Inst_Side_S_0: mesmo do Instante 2
-        --          Inst_Side_T_0: mesmo do Instante 2
+        --          Inst_Side_S_0:       mesmo do Instante 2
+        --          Inst_Side_T_0:       mesmo do Instante 2
         --          Inst_Tag_RRF_Dest_0: mesmo do Instante 2
         ic_0_tb <= to_unsigned(8, 33);
         inst_0_tb <= "01000000000100011000100000110011";
         WAIT FOR 5 ns;
 
-        ASSERT (inst_side_s_0_tb /= "00100100000000000000000000000000000000") REPORT "Instante 3 - Inst_Side_S_0 correto!" SEVERITY NOTE;
-        ASSERT (inst_side_t_0_tb /= "00101000000000000000000000000000000000") REPORT "Instante 3 - Inst_Side_T_0 correto!" SEVERITY NOTE;
-        ASSERT (inst_tag_rrf_dest_0_tb /= "01011") REPORT "Instante 3 - Inst_Tag_RRF_Dest_0 correto!" SEVERITY NOTE;
+        ASSERT (inst_side_s_0_tb = "00100100000000000000000000000000000000") REPORT "Instante 3 - Inst_Side_S_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_side_t_0_tb = "00101000000000000000000000000000000000") REPORT "Instante 3 - Inst_Side_T_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_tag_rrf_dest_0_tb = "01011") REPORT "Instante 3 - Inst_Tag_RRF_Dest_0 incorreto!" SEVERITY FAILURE;
 
 
 
         --                                                 Instante 4                                                 --
         --                              Teste: escrita na RRF vindo da Reservation Station
         -- Inputs:
-        --          Read_Write_RRF_0_TB:   10000100000111111111111111111111100000
+        --          Read_Write_RRF_0_TB: 10000100000111111111111111111111100000
         --              Read_Write_RRF_0_TB(37):             1 (Operacao de escrita na RRF)
-        --              Read_Write_RRF_0_TB(36 DOWNTO 32):   00001 (1 = RRF(1) = renome do x14)
+        --              Read_Write_RRF_0_TB(36 DOWNTO 32):   00001 (1 = RRF(1) = primeiro renome do x14)
         --              Read_Write_RRF_0_TB(31 DOWNTO 0):    00000111111111111111111111100000 (134217696 = resultado de alguma operacao na RS = novo RRF_DATA)
         --
-        --          Read_Write_RRF_0_TB:   00000100000000000000000000000000000000
+        --          Read_Write_RRF_0_TB: 00000100000000000000000000000000000000
         --              Read_Write_RRF_0_TB(37):             0 (Operacao de leitura da RRF)
-        --              Read_Write_RRF_0_TB(36 DOWNTO 32):   00001 (1 = RRF(1) = renome do x14)
+        --              Read_Write_RRF_0_TB(36 DOWNTO 32):   00001 (1 = RRF(1) = primeiro renome do x14)
         --              Read_Write_RRF_0_TB(31 DOWNTO 0):    nao usado/nao levado em conta na operacao de leitura
         --
         -- Outputs esperados:
         --          RRF_Data_Out_0_TB: 0000100000111111111111111111111100000
-        --              RRF_Data_Out_0_TB(36 DOWNTO 32): 00001 (1 = RRF(1) = RRF_TAG onde foi realizada a escrita)
-        --              RRF_Data_Out_0_TB(31 DOWNTO 0):  00000111111111111111111111100000 (134217696 = RRF_DATA = dado lido da RRF_TAG na RRF)
+        --              RRF_Data_Out_0_TB(36 DOWNTO 32):     00001 (1 = RRF(1) = RRF_TAG onde foi realizada a escrita)
+        --              RRF_Data_Out_0_TB(31 DOWNTO 0):      00000111111111111111111111100000 (134217696 = RRF_DATA = dado lido da RRF_TAG na RRF)
         read_write_rrf_0_tb <= "10000100000111111111111111111111100000";
         WAIT FOR 5 ns;
         read_write_rrf_0_tb <= "00000100000000000000000000000000000000";
         WAIT FOR 5 ns;
 
-        ASSERT (rrf_data_out_0_tb /= "0000100000111111111111111111111100000") REPORT "Instante 4 - RRF_Data_Out_0 correto!" SEVERITY NOTE;
+        ASSERT (rrf_data_out_0_tb = "0000100000111111111111111111111100000") REPORT "Instante 4 - RRF_Data_Out_0 incorreto!" SEVERITY FAILURE;
+
+
+
+        --                                                 Instante 5                                                 --
+        --                           Teste: execucao de duas instrucoes de outros tipos
+        -- Instrucao 5) beq x19 x4 y
+        -- compara x19 e x4
+        -- TipoB = imm rs2 rs1 funct3 imm codop
+        -- Inputs: 
+        --          IC_0:   4
+        --          Inst_0: 11001110010010011000110111100011
+        --                      imm:    1100111
+        --                      rs2:    00100   (x4)
+        --                      rs1:    10011   (x19)
+        --                      funct3: 000
+        --                      imm:    11011
+        --                      codop:  1100011 (tipo B)
+        -- Outputs esperados:
+        --          Inst_Side_S_0: 00110000000000000000000000000000000000
+        --                      Inst_Side_S_0(37):           0 (use o ARF_DATA)
+        --                      Inst_Side_S_0(36 DOWNTO 32): 01100 (12 = RRF(12) = renome do x4)
+        --                      Inst_Side_S_0(31 DOWNTO 0):  00000000000000000000000000000000 (ARF_DATA do x4)
+        --
+        --          Inst_Side_T_0: 00110100000000000000000000000000000000
+        --                      Inst_Side_T_0(37):           0 (use o ARF_DATA)
+        --                      Inst_Side_T_0(36 DOWNTO 32): 01101 (13 = RRF(13) = renome do x19)
+        --                      Inst_Side_T_0(31 DOWNTO 0):  00000000000000000000000000000000 (ARF_DATA do x19)
+        --
+        --          Inst_Tag_RRF_Dest_0: 00000
+        --                      Inst_Tag_RRF_Dest_0: 0 (instrucao sem rd)
+        --
+        --
+        -- Instrucao 6) lui x17 y
+        -- x17 <= y & "0...0"
+        -- TipoU = imm rd codop
+        -- Inputs: 
+        --          IC_1:   5
+        --          Inst_1: 11000011000110011011100010110111
+        --                      imm:    11000011000110011011
+        --                      rd:     10001   (x17)
+        --                      codop:  0110111 
+        --
+        -- Outputs esperados:
+        --          Inst_Side_S_1: 00000000000000000000000000000000000000
+        --                      Inst_Side_S_1:               0 (instrucao sem rs2)
+        --
+        --          Inst_Side_T_1: 00000000000000000000000000000000000000
+        --                      Inst_Side_T_1(37):           0 (instrucao sem rs1)
+        --
+        --          Inst_Tag_RRF_Dest_1: 01110
+        --                      Inst_Tag_RRF_Dest_1: (14 = RRF(14) = renome do x17)
+        ic_0_tb <= to_unsigned(4, 33);
+        inst_0_tb <= "11001110010010011000110111100011";
+        ic_1_tb <= to_unsigned(5, 33);
+        inst_1_tb <= "11000011000110011011100010110111";
+        WAIT FOR 5 ns;
+
+        ASSERT (inst_side_s_0_tb = "00110000000000000000000000000000000000") REPORT "Instante 5 - Inst_Side_S_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_side_t_0_tb = "00110100000000000000000000000000000000") REPORT "Instante 5 - Inst_Side_T_0 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_tag_rrf_dest_0_tb = "00000") REPORT "Instante 5 - Inst_Tag_RRF_Dest_0 incorreto!" SEVERITY FAILURE;
+
+        ASSERT (inst_side_s_1_tb = "00000000000000000000000000000000000000") REPORT "Instante 5 - Inst_Side_S_1 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_side_t_1_tb = "00000000000000000000000000000000000000") REPORT "Instante 5 - Inst_Side_T_1 incorreto!" SEVERITY FAILURE;
+        ASSERT (inst_tag_rrf_dest_1_tb = "01110") REPORT "Instante 5 - Inst_Tag_RRF_Dest_1 incorreto!" SEVERITY FAILURE;
 
 
 

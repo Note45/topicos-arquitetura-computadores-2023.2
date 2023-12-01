@@ -44,6 +44,7 @@ BEGIN
 
     Register_Renaming: PROCESS(Clk, Reset, Instruction_0, Instruction_1)
         VARIABLE RRF_Temp : BANKREG_RRF := (OTHERS => (OTHERS => '0'));
+        VARIABLE instrucao : STD_LOGIC_VECTOR(31 DOWNTO 0);
         VARIABLE rd, rs1, rs2 : STD_LOGIC_VECTOR(5 DOWNTO 0) := (OTHERS => '0');
         VARIABLE side_s, side_s_0, side_s_1, side_t, side_t_0, side_t_1 : STD_LOGIC_VECTOR(((1 + Size_RRF + 32) - 1) DOWNTO 0) := (OTHERS => '0');
         VARIABLE tag_rrf_dest, tag_rrf_dest_0, tag_rrf_dest_1 : STD_LOGIC_VECTOR(4 DOWNTO 0) := (OTHERS => '0');
@@ -54,32 +55,56 @@ BEGIN
             RRF <= (OTHERS => (OTHERS => '0'));
 
         ELSIF (Rising_edge(Clk)) THEN
+
             -- Cria uma copia temporaria da RRF para evitar concorrencia
             RRF_Temp := RRF;
 
-            -- Identificacao dos operandos com base na instrucao atual
+            -- Identificacao da instrucao atual
             IF (Instruction_Counter = IC_0) THEN
-                IF (Instruction_0(6 DOWNTO 0) = "0110011") THEN   -- Instrucao Tipo R = 3 Operandos
-                    rd  := '1' & Instruction_0(11 DOWNTO 7); -- '1' => registrador usado na instrucao
-                    rs1 := '1' & Instruction_0(19 DOWNTO 15);
-                    rs2 := '1' & Instruction_0(24 DOWNTO 20);
-                ELSE
-                    rd  := (OTHERS => '0');
-                    rs1 := (OTHERS => '0');
-                    rs2 := (OTHERS => '0');
-                END IF;
-
+                instrucao := Instruction_0;
             ELSIF (Instruction_Counter = IC_1) THEN
-                IF (Instruction_1(6 DOWNTO 0) = "0110011") THEN
-                    rd  := '1' & Instruction_1(11 DOWNTO 7);
-                    rs1 := '1' & Instruction_1(19 DOWNTO 15);
-                    rs2 := '1' & Instruction_1(24 DOWNTO 20);
-                ELSE
-                    rd  := (OTHERS => '0');
-                    rs1 := (OTHERS => '0');
-                    rs2 := (OTHERS => '0');
-                END IF;
+                instrucao := Instruction_1;
+            ELSE
+                instrucao := (OTHERS => '0');
             END IF;
+
+            -- Decodificacao dos operandos com base na instrucao atual
+            CASE instrucao(6 DOWNTO 0) IS
+                WHEN "0110011" =>                          -- Instrucao Tipo R = 3 Operandos
+                    rd  := '1' & instrucao(11 DOWNTO 7); -- MSB setado => registrador eh usado na instrucao
+                    rs1 := '1' & instrucao(19 DOWNTO 15);
+                    rs2 := '1' & instrucao(24 DOWNTO 20);
+
+                WHEN "1100111" | "0000011" | "0010011" =>  -- Instrucao Tipo I = 2 Operandos
+                    rd  := '1' & instrucao(11 DOWNTO 7);
+                    rs1 := '1' & instrucao(19 DOWNTO 15);
+                    side_s := (OTHERS => '0');
+
+                WHEN "0100011" =>                          -- Instrucao Tipo S = 2 Operandos
+                    tag_rrf_dest  := (OTHERS => '0');
+                    rs1 := '1' & instrucao(19 DOWNTO 15);
+                    rs2 := '1' & instrucao(24 DOWNTO 20);
+
+                WHEN "1100011" =>                          -- Instrucao Tipo B = 2 Operandos
+                    tag_rrf_dest  := (OTHERS => '0');
+                    rs1 := '1' & instrucao(19 DOWNTO 15);
+                    rs2 := '1' & instrucao(24 DOWNTO 20);
+
+                WHEN "0110111" | "0010111" =>              -- Instrucao Tipo U = 1 Operando
+                    rd  := '1' & instrucao(11 DOWNTO 7);
+                    side_t := (OTHERS => '0');
+                    side_s := (OTHERS => '0');
+                    
+                WHEN "1101111" =>                          -- Instrucao Tipo J = 1 Operando
+                    rd  := '1' & instrucao(11 DOWNTO 7);
+                    side_t := (OTHERS => '0');
+                    side_s := (OTHERS => '0');
+
+                WHEN OTHERS =>
+                    tag_rrf_dest  := (OTHERS => '0');
+                    side_t := (OTHERS => '0');
+                    side_s := (OTHERS => '0');
+            END CASE;
 
             -- Renomeacao dos registradores
             FOR i in RRF_Temp'range LOOP
@@ -136,7 +161,6 @@ BEGIN
 
                         rd(5) := '0';
                     END IF;
-
                 END IF;
             END LOOP;
 
@@ -157,6 +181,7 @@ BEGIN
                 Instruction_Counter <= Instruction_Counter + 1;
             END IF;
         END IF;
+
 
         -- Atualiza as saidas de cada instrucao
         Inst_Side_S_0 <= side_s_0;
@@ -194,6 +219,7 @@ BEGIN
                 END IF;
             END IF;
         END IF;
+
 
         -- Atualiza a RRF
         RRF <= RRF_Temp;
