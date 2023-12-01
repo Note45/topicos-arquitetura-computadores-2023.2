@@ -13,18 +13,19 @@ ENTITY RegisterRenameUnit IS
 
         IC_0                : IN UNSIGNED(0 TO 32);                                     -- Instruction_Counter de Inst_0
         Instruction_0       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        Read_Write_RRF_0    : IN STD_LOGIC_VECTOR(37 DOWNTO 0);                         -- OPERATION(37), TAG(36 DOWNTO 32) e DATA(31 DOWNTO 0)
         Inst_Side_S_0       : OUT STD_LOGIC_VECTOR(((1 + Size_RRF + 32) - 1) DOWNTO 0); -- VALID_S(37), TAG_S(36 DOWNTO 32) e DATA_S(31 DOWNTO 0)
         Inst_Side_T_0       : OUT STD_LOGIC_VECTOR(((1 + Size_RRF + 32) - 1) DOWNTO 0); -- VALID_T(37), TAG_T(36 DOWNTO 32) e DATA_T(31 DOWNTO 0)
         Inst_Tag_RRF_Dest_0 : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);                         -- TAG_RRF de RD de Inst_0
+        RRF_Data_Out_0      : OUT STD_LOGIC_VECTOR(36 DOWNTO 0);                        -- RRF_TAG_LIDA(36 DOWNTO 32) e RRF_DATA_LIDO(31 DOWNTO 0)
 
         IC_1                : IN UNSIGNED(0 TO 32);                                     -- Instruction_Counter de Inst_1
         Instruction_1       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        Read_Write_RRF_1    : IN STD_LOGIC_VECTOR(37 DOWNTO 0);                         -- OPERATION(37), TAG(36 DOWNTO 32) e DATA(31 DOWNTO 0)
         Inst_Side_S_1       : OUT STD_LOGIC_VECTOR(((1 + Size_RRF + 32) - 1) DOWNTO 0); -- VALID_S(37), TAG_S(36 DOWNTO 32) e DATA_S(31 DOWNTO 0)
         Inst_Side_T_1       : OUT STD_LOGIC_VECTOR(((1 + Size_RRF + 32) - 1) DOWNTO 0); -- VALID_T(37), TAG_T(36 DOWNTO 32) e DATA_T(31 DOWNTO 0)
         Inst_Tag_RRF_Dest_1 : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);                         -- TAG_RRF de RD de Inst_1
-
-        Read_Write_RRF      : IN STD_LOGIC_VECTOR(37 DOWNTO 0);  -- OPERATION(37), TAG(36 DOWNTO 32) e DATA(31 DOWNTO 0)
-        RRF_Data_Out        : OUT STD_LOGIC_VECTOR(36 DOWNTO 0); -- RRF_TAG_LIDA(36 DOWNTO 32) e RRF_DATA_LIDO(31 DOWNTO 0)
+        RRF_Data_Out_1      : OUT STD_LOGIC_VECTOR(36 DOWNTO 0);                        -- RRF_TAG_LIDA(36 DOWNTO 32) e RRF_DATA_LIDO(31 DOWNTO 0)
 
         Commit_Reorder_Buffer : IN STD_LOGIC_VECTOR(32 DOWNTO 0)
     );
@@ -39,7 +40,6 @@ ARCHITECTURE behavioral of RegisterRenameUnit IS
     SIGNAL RRF : BANKREG_RRF := (OTHERS => (OTHERS => '0'));   -- RRF = Renamed Bank Register
 
     SIGNAL Instruction_Counter : UNSIGNED(0 TO 32) := (OTHERS => '0');
-    SIGNAL placeholder : bit := '0';
 BEGIN
 
     Register_Renaming: PROCESS(Clk, Reset, Instruction_0, Instruction_1)
@@ -60,7 +60,7 @@ BEGIN
             -- Identificacao dos operandos com base na instrucao atual
             IF (Instruction_Counter = IC_0) THEN
                 IF (Instruction_0(6 DOWNTO 0) = "0110011") THEN   -- Instrucao Tipo R = 3 Operandos
-                    rd  := '1' & Instruction_0(11 DOWNTO 7);    -- registrador(5) = '1' => registrador usado na instrucao
+                    rd  := '1' & Instruction_0(11 DOWNTO 7); -- '1' => registrador usado na instrucao
                     rs1 := '1' & Instruction_0(19 DOWNTO 15);
                     rs2 := '1' & Instruction_0(24 DOWNTO 20);
                 ELSE
@@ -145,24 +145,55 @@ BEGIN
                 side_s_0 := side_s;
                 side_t_0 := side_t;
                 tag_rrf_dest_0 := tag_rrf_dest;
+
+                -- Aguarda a instrucao seguinte
+                Instruction_Counter <= Instruction_Counter + 1;
+
             ELSIF (Instruction_Counter = IC_1) THEN
                 side_s_1 := side_s;
                 side_t_1 := side_t;
                 tag_rrf_dest_1 := tag_rrf_dest;
-            END IF;
 
-            -- Aguarda a instrucao seguinte
-            Instruction_Counter <= Instruction_Counter + 1;
+                Instruction_Counter <= Instruction_Counter + 1;
+            END IF;
         END IF;
 
         -- Atualiza as saidas de cada instrucao
         Inst_Side_S_0 <= side_s_0;
         Inst_Side_T_0 <= side_t_0;
         Inst_Tag_RRF_Dest_0 <= tag_rrf_dest_0;
+        IF (Read_Write_RRF_0(37) = '0') THEN    -- Leitura da RRF solicitada pela entrada da RS
+            IF (RRF_Temp(to_integer(unsigned(Read_Write_RRF_0(36 DOWNTO 32))))(1) = '1') THEN  -- Se RRF(Tag)(RRF_VALID) esta setado
+                RRF_Data_Out_0 <= Read_Write_RRF_0(36 DOWNTO 32) & RRF_Temp(to_integer(unsigned(Read_Write_RRF_0(36 DOWNTO 32))))(33 DOWNTO 2); -- Retorna o dado na RRF
+            ELSE
+                RRF_Data_Out_0 <= (OTHERS => '0');
+            END IF;
+        ELSE                                    -- Escrita da RRF solicitada pela saida da RS
+            IF (RRF_Temp(to_integer(unsigned(Read_Write_RRF_0(36 DOWNTO 32))))(0) = '1') THEN -- Se o RRF_BUSY esta setado
+                IF (RRF_Temp(to_integer(unsigned(Read_Write_RRF_0(36 DOWNTO 32))))(1) = '0') THEN  -- Se o RRF_VALID nao esta setado
+                    RRF_Temp(to_integer(unsigned(Read_Write_RRF_0(36 DOWNTO 32))))(33 DOWNTO 2) := Read_Write_RRF_0(31 DOWNTO 0); -- Realiza a escrita pendente na RRF
+                    RRF_Temp(to_integer(unsigned(Read_Write_RRF_0(36 DOWNTO 32))))(1) := '1'; -- Seta o RRF_VALID
+                END IF;
+            END IF;
+        END IF;
 
         Inst_Side_S_1 <= side_s_1;
         Inst_Side_T_1 <= side_t_1;
         Inst_Tag_RRF_Dest_1 <= tag_rrf_dest_1;
+        IF (Read_Write_RRF_1(37) = '0') THEN
+            IF (RRF_Temp(to_integer(unsigned(Read_Write_RRF_1(36 DOWNTO 32))))(1) = '1') THEN
+                RRF_Data_Out_1 <= Read_Write_RRF_1(36 DOWNTO 32) & RRF_Temp(to_integer(unsigned(Read_Write_RRF_1(36 DOWNTO 32))))(33 DOWNTO 2);
+            ELSE
+                RRF_Data_Out_1 <= (OTHERS => '0');
+            END IF;
+        ELSE
+            IF (RRF_Temp(to_integer(unsigned(Read_Write_RRF_1(36 DOWNTO 32))))(0) = '1') THEN
+                IF (RRF_Temp(to_integer(unsigned(Read_Write_RRF_1(36 DOWNTO 32))))(1) = '0') THEN
+                    RRF_Temp(to_integer(unsigned(Read_Write_RRF_1(36 DOWNTO 32))))(33 DOWNTO 2) := Read_Write_RRF_1(31 DOWNTO 0);
+                    RRF_Temp(to_integer(unsigned(Read_Write_RRF_1(36 DOWNTO 32))))(1) := '1';
+                END IF;
+            END IF;
+        END IF;
 
         -- Atualiza a RRF
         RRF <= RRF_Temp;
