@@ -4,85 +4,193 @@ USE IEEE.NUMERIC_STD.ALL;
 
 ENTITY RegisterRenameUnit_TagFinder IS
     PORT(
-        RRF_Busy_Vector_Slice_0   :  IN STD_LOGIC_VECTOR((((2**5)/4) - 1) DOWNTO 0);
-        RRF_Busy_Vector_Slice_1   :  IN STD_LOGIC_VECTOR((((2**5)/4) - 1) DOWNTO 0);
-        RRF_Busy_Vector_Slice_2   :  IN STD_LOGIC_VECTOR((((2**5)/4) - 1) DOWNTO 0);
-        RRF_Busy_Vector_Slice_3   :  IN STD_LOGIC_VECTOR((((2**5)/4) - 1) DOWNTO 0);
+        RRF_Busy_Vector_Slice_0     :  IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        RRF_Busy_Vector_Slice_1     :  IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        RRF_Busy_Vector_Slice_2     :  IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+        RRF_Busy_Vector_Slice_3     :  IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-        Three_Tags_Inst_0         : OUT STD_LOGIC_VECTOR(14 DOWNTO 0);
-        Three_Tags_Inst_1         : OUT STD_LOGIC_VECTOR(14 DOWNTO 0);
-        Three_Tags_Inst_2         : OUT STD_LOGIC_VECTOR(14 DOWNTO 0);
-        Three_Tags_Inst_3         : OUT STD_LOGIC_VECTOR(14 DOWNTO 0)
+        Inst_0_RRF_Tag_RD           : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);                     -- IS_VALID(5) & RRF_TAG(4 DOWNTO 0)
+        Inst_1_RRF_Tag_RD           : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+        Inst_2_RRF_Tag_RD           : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
+        Inst_3_RRF_Tag_RD           : OUT STD_LOGIC_VECTOR(5 DOWNTO 0)
     );
 END ENTITY RegisterRenameUnit_TagFinder;
 
 ARCHITECTURE busca of RegisterRenameUnit_TagFinder IS
 
-    SIGNAL Tags_I0 : STD_LOGIC_VECTOR(14 DOWNTO 0) := (OTHERS => '1');   -- Three tags concatenated, one for each possible register of the instruction 
-    SIGNAL Tags_I1 : STD_LOGIC_VECTOR(14 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL Tags_I2 : STD_LOGIC_VECTOR(14 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL Tags_I3 : STD_LOGIC_VECTOR(14 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL RRF_Tag_RD_0 : STD_LOGIC_VECTOR(5 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL RRF_Tag_RD_1 : STD_LOGIC_VECTOR(5 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL RRF_Tag_RD_2 : STD_LOGIC_VECTOR(5 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL RRF_Tag_RD_3 : STD_LOGIC_VECTOR(5 DOWNTO 0) := (OTHERS => '0');
 
 BEGIN
 
-    Three_Tags_Inst_0 <= Tags_I0;
-    Three_Tags_Inst_1 <= Tags_I1;
-    Three_Tags_Inst_2 <= Tags_I2;
-    Three_Tags_Inst_3 <= Tags_I3;
+    Inst_0_RRF_Tag_RD <= RRF_Tag_RD_0;
+    Inst_1_RRF_Tag_RD <= RRF_Tag_RD_1;
+    Inst_2_RRF_Tag_RD <= RRF_Tag_RD_2;
+    Inst_3_RRF_Tag_RD <= RRF_Tag_RD_3;
 
     TagFinder_Inst_0 : PROCESS (RRF_Busy_Vector_Slice_0)
     BEGIN
-        FOR i IN 0 TO RRF_Busy_Vector_Slice_0'HIGH LOOP
-            IF (RRF_Busy_Vector_Slice_0(i) = '0') THEN
-                Tags_I0(4 DOWNTO 0) <= std_logic_vector(to_unsigned(i, 5));
+        IF (RRF_Busy_Vector_Slice_0(0) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00000";
 
-                FOR j IN (i+1) TO RRF_Busy_Vector_Slice_0'HIGH LOOP
-                    IF (RRF_Busy_Vector_Slice_0(j) = '0') THEN
-                        Tags_I0(9 DOWNTO 5) <= std_logic_vector(to_unsigned(j, 5));
+        ELSIF (RRF_Busy_Vector_Slice_0(1) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00001";
 
-                        FOR k IN (j+1) TO RRF_Busy_Vector_Slice_0'HIGH LOOP
-                            IF (RRF_Busy_Vector_Slice_0(k) = '0') THEN
-                                Tags_I0(14 DOWNTO 10) <= std_logic_vector(to_unsigned(k, 5));
+        ELSIF (RRF_Busy_Vector_Slice_0(2) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00010";
 
-                                EXIT;
-                            END IF;
-                        END LOOP;
+        ELSIF (RRF_Busy_Vector_Slice_0(3) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00011";
 
-                        EXIT;
-                    END IF;
-                END LOOP;
+        ELSIF (RRF_Busy_Vector_Slice_0(4) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00100";
 
-                EXIT;
-            END IF;
-        END LOOP;
+        ELSIF (RRF_Busy_Vector_Slice_0(5) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00101";
+
+        ELSIF (RRF_Busy_Vector_Slice_0(6) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00110";
+
+        ELSIF (RRF_Busy_Vector_Slice_0(7) = '0') THEN
+            RRF_Tag_RD_0(5) <= '0';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00111";
+
+        ELSE
+            RRF_Tag_RD_0(5) <= '1';
+            RRF_Tag_RD_0(4 DOWNTO 0) <= "00000";
+        END IF;
     END PROCESS;
 
 
     TagFinder_Inst_1 : PROCESS (RRF_Busy_Vector_Slice_1)
     BEGIN
-        FOR i IN 0 TO RRF_Busy_Vector_Slice_1'HIGH LOOP
-            IF (RRF_Busy_Vector_Slice_1(i) = '0') THEN
-                Tags_I1(4 DOWNTO 0) <= std_logic_vector(to_unsigned(i+8, 5));
+        IF (RRF_Busy_Vector_Slice_1(0) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01000";
 
-                FOR j IN (i+1) TO RRF_Busy_Vector_Slice_1'HIGH LOOP
-                    IF (RRF_Busy_Vector_Slice_1(j) = '0') THEN
-                        Tags_I1(9 DOWNTO 5) <= std_logic_vector(to_unsigned(j+8, 5));
+        ELSIF (RRF_Busy_Vector_Slice_1(1) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01001";
 
-                        FOR k IN (j+1) TO RRF_Busy_Vector_Slice_1'HIGH LOOP
-                            IF (RRF_Busy_Vector_Slice_1(k) = '0') THEN
-                                Tags_I1(14 DOWNTO 10) <= std_logic_vector(to_unsigned(k+8, 5));
+        ELSIF (RRF_Busy_Vector_Slice_1(2) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01010";
 
-                                EXIT;
-                            END IF;
-                        END LOOP;
+        ELSIF (RRF_Busy_Vector_Slice_1(3) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01011";
 
-                        EXIT;
-                    END IF;
-                END LOOP;
+        ELSIF (RRF_Busy_Vector_Slice_1(4) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01100";
 
-                EXIT;
-            END IF;
-        END LOOP;
+        ELSIF (RRF_Busy_Vector_Slice_1(5) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01101";
+
+        ELSIF (RRF_Busy_Vector_Slice_1(6) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01110";
+
+        ELSIF (RRF_Busy_Vector_Slice_1(7) = '0') THEN
+            RRF_Tag_RD_1(5) <= '0';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "01111";
+
+        ELSE
+            RRF_Tag_RD_1(5) <= '1';
+            RRF_Tag_RD_1(4 DOWNTO 0) <= "00000";
+        END IF;
+    END PROCESS;
+
+
+    TagFinder_Inst_2 : PROCESS (RRF_Busy_Vector_Slice_2)
+    BEGIN
+        IF (RRF_Busy_Vector_Slice_2(0) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10000";
+
+        ELSIF (RRF_Busy_Vector_Slice_2(1) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10001";
+
+        ELSIF (RRF_Busy_Vector_Slice_2(2) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10010";
+
+        ELSIF (RRF_Busy_Vector_Slice_2(3) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10011";
+
+        ELSIF (RRF_Busy_Vector_Slice_2(4) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10100";
+
+        ELSIF (RRF_Busy_Vector_Slice_2(5) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10101";
+
+        ELSIF (RRF_Busy_Vector_Slice_2(6) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10110";
+
+        ELSIF (RRF_Busy_Vector_Slice_2(7) = '0') THEN
+            RRF_Tag_RD_2(5) <= '0';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "10111";
+
+        ELSE
+            RRF_Tag_RD_2(5) <= '1';
+            RRF_Tag_RD_2(4 DOWNTO 0) <= "00000";
+        END IF;
+    END PROCESS;
+
+
+    TagFinder_Inst_3 : PROCESS (RRF_Busy_Vector_Slice_3)
+    BEGIN
+        IF (RRF_Busy_Vector_Slice_3(0) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11000";
+
+        ELSIF (RRF_Busy_Vector_Slice_3(1) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11001";
+
+        ELSIF (RRF_Busy_Vector_Slice_3(2) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11010";
+
+        ELSIF (RRF_Busy_Vector_Slice_3(3) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11011";
+
+        ELSIF (RRF_Busy_Vector_Slice_3(4) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11100";
+
+        ELSIF (RRF_Busy_Vector_Slice_3(5) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11101";
+
+        ELSIF (RRF_Busy_Vector_Slice_3(6) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11110";
+
+        ELSIF (RRF_Busy_Vector_Slice_3(7) = '0') THEN
+            RRF_Tag_RD_3(5) <= '0';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "11111";
+
+        ELSE
+            RRF_Tag_RD_3(5) <= '1';
+            RRF_Tag_RD_3(4 DOWNTO 0) <= "00000";
+        END IF;
     END PROCESS;
 
 
