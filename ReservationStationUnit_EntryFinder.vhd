@@ -18,65 +18,28 @@ BEGIN
 
     -- Identifies the index of first available entry on the Reservation Station
     -- based on it's Busy bit vector
+    Inst_0_Entry <= "000" WHEN (Busy_Vector(0) = '0') ELSE
+                    "001" WHEN (Busy_Vector(1) = '0') ELSE
+                    "010" WHEN (Busy_Vector(2) = '0') ELSE
+                    "011" WHEN (Busy_Vector(3) = '0') ELSE
+                    "100";
 
-    Inst_0_Allocation : PROCESS (Busy_Vector)
-    BEGIN
-        IF (Busy_Vector(0) = '0') THEN
-            Inst_0_Entry <= "000";
-        ELSIF (Busy_Vector(1) = '0') THEN
-            Inst_0_Entry <= "001";
-        ELSIF (Busy_Vector(2) = '0') THEN
-            Inst_0_Entry <= "010";
-        ELSIF (Busy_Vector(3) = '0') THEN
-            Inst_0_Entry <= "011";
-        ELSE
-            Inst_0_Entry <= "100";
-        END IF;
-    END PROCESS;
+    Inst_1_Entry <= "001" WHEN (Busy_Vector(1) = '0') ELSE
+                    "010" WHEN (Busy_Vector(2) = '0') ELSE
+                    "011" WHEN (Busy_Vector(3) = '0') ELSE
+                    "000" WHEN (Busy_Vector(0) = '0') ELSE
+                    "100";
 
-    Inst_1_Allocation : PROCESS (Busy_Vector)
-    BEGIN
-        IF (Busy_Vector(1) = '0') THEN
-            Inst_1_Entry <= "001";
-        ELSIF (Busy_Vector(2) = '0') THEN
-            Inst_1_Entry <= "010";
-        ELSIF (Busy_Vector(3) = '0') THEN
-            Inst_1_Entry <= "011";
-        ELSIF (Busy_Vector(0) = '0') THEN
-            Inst_1_Entry <= "000";
-        ELSE
-            Inst_1_Entry <= "100";
-        END IF;
-    END PROCESS;
+    Inst_2_Entry <= "010" WHEN (Busy_Vector(2) = '0') ELSE
+                    "011" WHEN (Busy_Vector(3) = '0') ELSE
+                    "000" WHEN (Busy_Vector(0) = '0') ELSE
+                    "001" WHEN (Busy_Vector(1) = '0') ELSE
+                    "100";
 
-    Inst_2_Allocation : PROCESS (Busy_Vector)
-    BEGIN
-        IF (Busy_Vector(2) = '0') THEN
-            Inst_2_Entry <= "010";
-        ELSIF (Busy_Vector(3) = '0') THEN
-            Inst_2_Entry <= "011";
-        ELSIF (Busy_Vector(0) = '0') THEN
-            Inst_2_Entry <= "000";
-        ELSIF (Busy_Vector(1) = '0') THEN
-            Inst_2_Entry <= "001";
-        ELSE
-            Inst_2_Entry <= "100";
-        END IF;
-    END PROCESS;
-
-    Inst_3_Allocation : PROCESS (Busy_Vector)
-    BEGIN
-        IF (Busy_Vector(3) = '0') THEN
-            Inst_3_Entry <= "011";
-        ELSIF (Busy_Vector(0) = '0') THEN
-            Inst_3_Entry <= "000";
-        ELSIF (Busy_Vector(1) = '0') THEN
-            Inst_3_Entry <= "001";
-        ELSIF (Busy_Vector(2) = '0') THEN
-            Inst_3_Entry <= "010";
-        ELSE
-            Inst_3_Entry <= "100";
-        END IF;
-    END PROCESS;
+    Inst_3_Entry <= "011" WHEN (Busy_Vector(3) = '0') ELSE
+                    "000" WHEN (Busy_Vector(0) = '0') ELSE
+                    "001" WHEN (Busy_Vector(1) = '0') ELSE
+                    "010" WHEN (Busy_Vector(2) = '0') ELSE
+                    "100";
 
 END ARCHITECTURE behavior;
