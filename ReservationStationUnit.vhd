@@ -41,11 +41,13 @@ END ENTITY ReservationStationUnit;
 
 ARCHITECTURE behavior OF ReservationStationUnit IS
 
-    TYPE BANK_INST IS ARRAY(0 TO 3) OF STD_LOGIC_VECTOR(67 DOWNTO 0); -- ENTRY_BUSY(1b) & OPERAND_1(32b) & OPERAND_1_VALID(1b) & OPERAND_2(32b) & OPERAND_2_VALID(1b) & ENTRY_READY(1b)
+    TYPE BANK_INST IS ARRAY(0 TO 3) OF STD_LOGIC_VECTOR(67 DOWNTO 0); -- RSU_BUSY(67) & RSU_OPERAND_1(66 DOWNTO 35) & RSU_OPERAND_1_VALID(34) & RSU_OPERAND_2(33 DOWNTO 2) & RSU_OPERAND_2_VALID(1) & RSU_READY(0)
     SIGNAL RSU : BANK_INST := (OTHERS => (OTHERS => '0'));
 
     SIGNAL FunctionalUnit_S : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
     SIGNAL FunctionalUnit_T : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
+
+
 
     COMPONENT ReservationStationUnit_EntryFinder IS
         PORT(
@@ -58,11 +60,13 @@ ARCHITECTURE behavior OF ReservationStationUnit IS
         );
     END COMPONENT ReservationStationUnit_EntryFinder;
 
-    SIGNAL Busy_RSU : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
-    SIGNAL Entry_0_RSU : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
-    SIGNAL Entry_1_RSU : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
-    SIGNAL Entry_2_RSU : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
-    SIGNAL Entry_3_RSU : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
+    SIGNAL Busy_RSU     : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
+    SIGNAL Entry_0_RSU  : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
+    SIGNAL Entry_1_RSU  : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
+    SIGNAL Entry_2_RSU  : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
+    SIGNAL Entry_3_RSU  : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
+
+
 
     COMPONENT ReservationStationUnit_IssueSelector IS
         PORT(
@@ -79,12 +83,15 @@ ARCHITECTURE behavior OF ReservationStationUnit IS
         );
     END COMPONENT ReservationStationUnit_IssueSelector;
 
-    SIGNAL Ready_RSU : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
-    SIGNAL Selected_RSU_Index : STD_LOGIC_VECTOR(1 DOWNTO 0) := "00";
-    SIGNAL Selected_RSU_Entry : STD_LOGIC_VECTOR(67 DOWNTO 0) := (others => '0');
+    SIGNAL Ready_RSU            : STD_LOGIC_VECTOR(3 DOWNTO 0)  := "0000";
+    SIGNAL Selected_RSU_Index   : STD_LOGIC_VECTOR(1 DOWNTO 0)  := "00";
+    SIGNAL Selected_RSU_Entry   : STD_LOGIC_VECTOR(67 DOWNTO 0) := "00000000000000000000000000000000000000000000000000000000000000000000";
+
+
 
 BEGIN
 
+    -- Maps free entries on the RSU for each possible instruction coming from the dispatcher
     Busy_RSU <= RSU(3)(67) & RSU(2)(67) & RSU(1)(67) & RSU(0)(67);
 
     RSU_Entry_Finder : ReservationStationUnit_EntryFinder
@@ -97,6 +104,8 @@ BEGIN
         Inst_3_Entry => Entry_3_RSU
     );
 
+
+    -- Determines the first entry on the RSU that is ready for execution
     Ready_RSU <= RSU(3)(0) & RSU(2)(0) & RSU(1)(0) & RSU(0)(0);
 
     RSU_Issue_Selector : ReservationStationUnit_IssueSelector
@@ -112,10 +121,11 @@ BEGIN
         RSU_Entry_Selected => Selected_RSU_Entry
     );
 
-    --
+
     FU_Operand_S <= FunctionalUnit_S;
     FU_Operand_T <= FunctionalUnit_T;
-    Instruction_Reserving : PROCESS (Clock, Reset)
+
+    Instruction_Dispatching : PROCESS (Clock, Reset)
     BEGIN
 
         IF (Reset = '1') THEN
@@ -186,6 +196,7 @@ BEGIN
                     RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(1) <= NOT Inst_3_Valid_T;
                 END IF;
             END IF;
+
 
 
 
@@ -363,13 +374,9 @@ BEGIN
 
 
 
-            --------------------------------------------------------------------------------------------------------
-            --                                     UPDATING READY BITS BLOCK                                      --
-            --
-            -- Responsible for updating the RSU_READY bits of every entry on the RSU, which it becomes '1' when 
-            -- RSU_Operand_1 and RSU_Operand_2 of that entry are also '1' (valid operands)
-            --
-            --------------------------------------------------------------------------------------------------------
+
+            -- Updating the RSU_READY bit of every entry on the RSU, according to the status of both RSU_OPERANDS
+            -- If both are set, RSU_READY is also set
             RSU(0)(0) <= RSU(0)(34) AND RSU(0)(1);
             RSU(1)(0) <= RSU(1)(34) AND RSU(1)(1);
             RSU(2)(0) <= RSU(2)(34) AND RSU(2)(1);
@@ -377,25 +384,19 @@ BEGIN
 
 
 
-            --------------------------------------------------------------------------------------------------------
-            --                                     UPDATING READY BITS BLOCK                                      --
-            --
-            -- Responsible for updating the RSU_READY bits of every entry on the RSU, which it becomes '1' when 
-            -- RSU_Operand_1 and RSU_Operand_2 of that entry are also '1' (valid operands)
-            --
-            --------------------------------------------------------------------------------------------------------
 
-            -- If the RSU_READY of the first entry of RSU is set (instruction ready)
+            -- If the RSU_READY of the first entry of RSU is set (instruction ready for execution)
+            -- Sends the instruction to the respective functional unit linked with the RS, and resets their RSU entry
             IF (Selected_RSU_Entry(0) = '1') THEN
                 FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
                 FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
                 RSU(to_integer(unsigned((Selected_RSU_Index)))) <= (OTHERS => '0');
             END IF;
 
+
+
+
         END IF;
-
-
-
     END PROCESS;
 
 END ARCHITECTURE behavior;

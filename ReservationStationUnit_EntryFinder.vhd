@@ -16,7 +16,7 @@ END ENTITY ReservationStationUnit_EntryFinder;
 ARCHITECTURE behavior OF ReservationStationUnit_EntryFinder IS
 BEGIN
 
-    -- Identifies the index of first available entry on the Reservation Station
+    -- Identifies the index of first available entry on the Reservation Station,
     -- based on it's Busy bit vector
     Inst_0_Entry <= "000" WHEN (Busy_Vector(0) = '0') ELSE
                     "001" WHEN (Busy_Vector(1) = '0') ELSE
