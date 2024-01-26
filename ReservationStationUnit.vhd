@@ -122,6 +122,7 @@ BEGIN
     );
 
 
+    -- Dispatching of upcoming instructions on the Reservation Station
     FU_Operand_S <= FunctionalUnit_S;
     FU_Operand_T <= FunctionalUnit_T;
 
