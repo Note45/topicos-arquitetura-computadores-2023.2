@@ -37,6 +37,8 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Inst_3_Valid_S                  :  IN STD_LOGIC;
             Inst_3_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_3_Valid_T                  :  IN STD_LOGIC;
+
+            Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
     
             FU_Operand_S                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             FU_Operand_T                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
@@ -75,6 +77,8 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL INST_3_SIDE_T_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_3_VALID_T_TB                    : STD_LOGIC                             := '0';
 
+    SIGNAL FUNCTIONAL_UNIT_BUSY_TB              : STD_LOGIC                             := '0';
+
     SIGNAL FU_OPERAND_S_TB                      : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL FU_OPERAND_T_TB                      : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
 
@@ -90,7 +94,7 @@ BEGIN
         WAIT FOR CLOCK_PERIOD/2;
 
         IF (CYCLE_COUNT = 7) THEN
-            REPORT "Fim" SEVERITY FAILURE;
+            REPORT "END OF TESTBENCH" SEVERITY FAILURE;
         END IF;
     END PROCESS;
 
@@ -127,6 +131,8 @@ BEGIN
         Inst_3_Valid_S => INST_3_VALID_S_TB,
         Inst_3_Side_T => INST_3_SIDE_T_TB,
         Inst_3_Valid_T => INST_3_VALID_T_TB,
+
+        Functional_Unit_Busy => FUNCTIONAL_UNIT_BUSY_TB,
 
         FU_Operand_S => FU_OPERAND_S_TB,
         FU_Operand_T => FU_OPERAND_T_TB
@@ -214,20 +220,24 @@ BEGIN
 
         INSTRUCTION_2_TB <= "00000000000000000000000000000000";
         WAIT FOR 2.6 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '1';
         ASSERT (CYCLE_COUNT = 3 AND FU_OPERAND_S_TB = "00000000000000000000000000011010") REPORT "Test 1 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
         ASSERT (CYCLE_COUNT = 3 AND FU_OPERAND_T_TB = "00000000000000000000000000011111") REPORT "Test 1 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
         REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         --                             Cycle 4                             --
         -- Testing: Issuing of Instruction_2 from Cycle 1;
         INSTRUCTION_1_TB <= "00000000000000000000000000000000";
         WAIT FOR 2.6 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '1';
         ASSERT (CYCLE_COUNT = 4 AND FU_OPERAND_S_TB = "00000000000000000000000000010001") REPORT "Test 2 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
         ASSERT (CYCLE_COUNT = 4 AND FU_OPERAND_T_TB = "00000000000000000000000000010100") REPORT "Test 2 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
         REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         --                             Cycle 5                             --
@@ -235,19 +245,23 @@ BEGIN
         -- Testing: Issuing of the first instruction ready on the RSU (LSB to MSB) 
         -- Testing: Issuing of Instruction_2 from Cycle 2;
         WAIT FOR 2.6 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '1';
         ASSERT (CYCLE_COUNT = 5 AND FU_OPERAND_S_TB = "00000000000000000000000101010101") REPORT "Test 3 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
         ASSERT (CYCLE_COUNT = 5 AND FU_OPERAND_T_TB = "00000000000000000000000000100101") REPORT "Test 3 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
         REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         --                             Cycle 6                            --
         -- Testing: Issuing of Instruction_1 from Cycle 3;
         WAIT FOR 2.6 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '1';
         ASSERT (CYCLE_COUNT = 6 AND FU_OPERAND_S_TB = "11111111111111111111111111111111") REPORT "Test 4 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
         ASSERT (CYCLE_COUNT = 6 AND FU_OPERAND_T_TB = "11111111111111111111111111111111") REPORT "Test 4 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
         REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
+        FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         WAIT;

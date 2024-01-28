@@ -34,6 +34,8 @@ ENTITY ReservationStationUnit IS
         Inst_3_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_3_Valid_T                  :  IN STD_LOGIC;
 
+        Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
+
         FU_Operand_S                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         FU_Operand_T                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
@@ -402,12 +404,19 @@ BEGIN
 
 
 
-            -- If the RSU_READY of the first entry of RSU is set (instruction ready for execution)
-            -- Sends the instruction to the respective functional unit linked with the RS, and resets their RSU entry
-            IF (Selected_RSU_Entry(0) = '1') THEN
-                FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
-                FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
-                RSU(to_integer(unsigned((Selected_RSU_Index)))) <= "00000000000000000000000000000000000000000000000000000000000000000000";
+            -- If the associated Functional Unit is available
+            IF (Functional_Unit_Busy = '0') THEN
+
+                -- If the RSU_READY of the first entry of RSU is set (instruction ready for execution)
+                IF (Selected_RSU_Entry(0) = '1') THEN
+
+                    -- Sends the instruction to the respective functional unit linked with the RS, and resets their RSU entry
+                    FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
+                    FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
+                    RSU(to_integer(unsigned((Selected_RSU_Index)))) <= "00000000000000000000000000000000000000000000000000000000000000000000";
+
+                END IF;
+                
             END IF;
 
 
