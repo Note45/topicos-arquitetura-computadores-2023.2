@@ -11,6 +11,8 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Clock                           :  IN STD_LOGIC;
             Reset                           :  IN STD_LOGIC;
     
+            Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
+    
             Integer_FU_Bus_Write_On_RRF     :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
             Multiplier_FU_Bus_Write_On_RRF  :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
             
@@ -37,9 +39,8 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Inst_3_Valid_S                  :  IN STD_LOGIC;
             Inst_3_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_3_Valid_T                  :  IN STD_LOGIC;
-
-            Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
     
+            RSU_Buffer_State                : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);         -- RSU_BUSY(3) & RSU_BUSY(2) & RSU_BUSY(1) & RSU_BUSY(0)
             FU_Operand_S                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
             FU_Operand_T                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
         );
@@ -49,6 +50,8 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL CYCLE_COUNT                          : INTEGER                               := 0;
     SIGNAL CLOCK_TB                             : STD_LOGIC                             := '0';
     SIGNAL RESET_TB                             : STD_LOGIC                             := '0';
+
+    SIGNAL FUNCTIONAL_UNIT_BUSY_TB              : STD_LOGIC                             := '0';
 
     SIGNAL INTEGER_FU_BUS_WRITE_ON_RRF_TB       : STD_LOGIC_VECTOR(37 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB    : STD_LOGIC_VECTOR(37 DOWNTO 0)         := (OTHERS => '0');
@@ -77,8 +80,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL INST_3_SIDE_T_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_3_VALID_T_TB                    : STD_LOGIC                             := '0';
 
-    SIGNAL FUNCTIONAL_UNIT_BUSY_TB              : STD_LOGIC                             := '0';
-
+    SIGNAL RSU_BUFFER_STATE_TB                  : STD_LOGIC_VECTOR(3 DOWNTO 0)          := "0000";
     SIGNAL FU_OPERAND_S_TB                      : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL FU_OPERAND_T_TB                      : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
 
@@ -104,6 +106,8 @@ BEGIN
     PORT MAP(
         Clock => CLOCK_TB,
         Reset => RESET_TB,
+
+        Functional_Unit_Busy => FUNCTIONAL_UNIT_BUSY_TB,
 
         Integer_FU_Bus_Write_On_RRF => INTEGER_FU_BUS_WRITE_ON_RRF_TB,
         Multiplier_FU_Bus_Write_On_RRF => MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB,
@@ -132,8 +136,7 @@ BEGIN
         Inst_3_Side_T => INST_3_SIDE_T_TB,
         Inst_3_Valid_T => INST_3_VALID_T_TB,
 
-        Functional_Unit_Busy => FUNCTIONAL_UNIT_BUSY_TB,
-
+        RSU_Buffer_State => RSU_BUFFER_STATE_TB,
         FU_Operand_S => FU_OPERAND_S_TB,
         FU_Operand_T => FU_OPERAND_T_TB
     );

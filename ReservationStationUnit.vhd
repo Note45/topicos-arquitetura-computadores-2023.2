@@ -7,6 +7,8 @@ ENTITY ReservationStationUnit IS
         Clock                           :  IN STD_LOGIC;
         Reset                           :  IN STD_LOGIC;
 
+        Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
+
         Integer_FU_Bus_Write_On_RRF     :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
         Multiplier_FU_Bus_Write_On_RRF  :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
         
@@ -34,8 +36,7 @@ ENTITY ReservationStationUnit IS
         Inst_3_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_3_Valid_T                  :  IN STD_LOGIC;
 
-        Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
-
+        RSU_Buffer_State                : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);         -- RSU_BUSY(3) & RSU_BUSY(2) & RSU_BUSY(1) & RSU_BUSY(0)
         FU_Operand_S                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         FU_Operand_T                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
@@ -122,6 +123,9 @@ BEGIN
         RSU_Entry_Selected => Selected_RSU_Entry
     );
 
+
+    -- Returns to Dispatcher the state of the RSU buffer
+    RSU_Buffer_State <= RSU(3)(67) & RSU(2)(67) & RSU(1)(67) & RSU(0)(67);
 
     -- Dispatching of upcoming instructions on the Reservation Station
     FU_Operand_S <= FunctionalUnit_S;
