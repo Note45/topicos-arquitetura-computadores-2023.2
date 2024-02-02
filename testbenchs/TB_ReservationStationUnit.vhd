@@ -175,9 +175,8 @@ BEGIN
 
         --                             Cycle 2                             --
         -- Testing: Updating operands of an entry with data coming from Functional Units;
-        -- Testing: RSU choosing a free entry for a upcoming instruction;
         --
-        -- Arguments of Instruction_2: OR x28, x7, x0
+        -- Arguments of Instruction_0: OR x28, x7, x0
         --  SIDE_S: value 341
         --  VALID_S: '0' (above is an ARF_DATA = valid operand)
         --  SIDE_T: value 0
@@ -189,12 +188,13 @@ BEGIN
         INTEGER_FU_BUS_WRITE_ON_RRF_TB <= "10000100000000000000000000000000010001";
         MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB <= "10010000000000000000000000000000010100";
 
-        INSTRUCTION_2_TB <= "00000000000000111110111001111110";
-        INST_2_SIDE_S_TB <= "00000000000000000000000101010101";
-        INST_2_VALID_S_TB <= '0';
-        INST_2_SIDE_T_TB <= "00000000000000000000000000000000";
-        INST_2_VALID_T_TB <= '1';
+        INSTRUCTION_0_TB <= "00000000000000111110111001111110";
+        INST_0_SIDE_S_TB <= "00000000000000000000000101010101";
+        INST_0_VALID_S_TB <= '0';
+        INST_0_SIDE_T_TB <= "00000000000000000000000000000000";
+        INST_0_VALID_T_TB <= '1';
 
+        INSTRUCTION_2_TB <= "00000000000000000000000000000000";
         INSTRUCTION_3_TB <= "00000000000000000000000000000000";
         WAIT FOR 5 ns;
 
@@ -218,7 +218,7 @@ BEGIN
         INST_1_SIDE_T_TB <= "11111111111111111111111111111111";
         INST_1_VALID_T_TB <= '0';
 
-        INSTRUCTION_2_TB <= "00000000000000000000000000000000";
+        INSTRUCTION_0_TB <= "00000000000000000000000000000000";
         WAIT FOR 2.6 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '1';
         ASSERT (CYCLE_COUNT = 3 AND FU_OPERAND_S_TB = "00000000000000000000000000011010") REPORT "Test 1 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
@@ -243,7 +243,7 @@ BEGIN
         --                             Cycle 5                             --
         -- Testing: Multiple instructions on RSU ready to issue (Inst_2 from Cycle 2 and Inst_1 from Cycle 1);
         -- Testing: Issuing of the first instruction ready on the RSU (LSB to MSB) 
-        -- Testing: Issuing of Instruction_2 from Cycle 2;
+        -- Testing: Issuing of Instruction_0 from Cycle 2;
         WAIT FOR 2.6 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '1';
         ASSERT (CYCLE_COUNT = 5 AND FU_OPERAND_S_TB = "00000000000000000000000101010101") REPORT "Test 3 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
