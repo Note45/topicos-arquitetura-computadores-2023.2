@@ -5,6 +5,8 @@ USE IEEE.NUMERIC_STD.ALL;
 ENTITY DecoderUnit IS
     PORT(
         Clock               :  IN STD_LOGIC;
+        Reset               :  IN STD_LOGIC;
+        
         Instruction_0_In    :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Instruction_1_In    :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Instruction_2_In    :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -317,41 +319,44 @@ BEGIN
             CASE Instruction_2_In(6 DOWNTO 0) IS
                 WHEN "0110011" =>
                     I2_Control <= "111";
-                    I2_Funct7 <= Instruction_2_In(31 DOWNTO 25);
-                    I2_Funct3 <= Instruction_2_In(14 DOWNTO 12);
-                    I2_RD     <= Instruction_2_In(11 DOWNTO 7);
-                    I2_RS1    <= Instruction_2_In(19 DOWNTO 15);
-                    I2_RS2    <= Instruction_2_In(24 DOWNTO 20);
+                    I2_Funct7  <= Instruction_2_In(31 DOWNTO 25);
+                    I2_Funct3  <= Instruction_2_In(14 DOWNTO 12);
+                    I2_RD      <= Instruction_2_In(11 DOWNTO 7);
+                    I2_RS1     <= Instruction_2_In(19 DOWNTO 15);
+                    I2_RS2     <= Instruction_2_In(24 DOWNTO 20);
 
-                    I2_Imm    <= "00000000000000000000000000000000";
+                    I2_Imm     <= "00000000000000000000000000000000";
 
                 WHEN "1100111" | "0000011" | "0010011" =>
-                    I2_Funct7 <= "0000000";
-                    I2_Funct3 <= Instruction_2_In(14 DOWNTO 12);
-                    I2_RD     <= Instruction_2_In(11 DOWNTO 7);
-                    I2_RS1    <= Instruction_2_In(19 DOWNTO 15);
-                    I2_RS2    <= "00000";
+                    I2_Control <= "110";
+                    I2_Funct7  <= "0000000";
+                    I2_Funct3  <= Instruction_2_In(14 DOWNTO 12);
+                    I2_RD      <= Instruction_2_In(11 DOWNTO 7);
+                    I2_RS1     <= Instruction_2_In(19 DOWNTO 15);
+                    I2_RS2     <= "00000";
 
                     I2_Imm(31 DOWNTO 11) <= (OTHERS => Instruction_2_In(31));
                     I2_Imm(10 DOWNTO 0)  <= Instruction_2_In(30 DOWNTO 20);
 
                 WHEN "0100011" =>
-                    I2_Funct7 <= "0000000";
-                    I2_Funct3 <= Instruction_2_In(14 DOWNTO 12);
-                    I2_RD     <= "00000";
-                    I2_RS1    <= Instruction_2_In(19 DOWNTO 15);
-                    I2_RS2    <= Instruction_2_In(24 DOWNTO 20);
+                    I2_Control <= "011";
+                    I2_Funct7  <= "0000000";
+                    I2_Funct3  <= Instruction_2_In(14 DOWNTO 12);
+                    I2_RD      <= "00000";
+                    I2_RS1     <= Instruction_2_In(19 DOWNTO 15);
+                    I2_RS2     <= Instruction_2_In(24 DOWNTO 20);
 
                     I2_Imm(31 DOWNTO 11) <= (OTHERS => Instruction_2_In(31));
                     I2_Imm(10 DOWNTO 5)  <= Instruction_2_In(30 DOWNTO 25);
                     I2_Imm(4 DOWNTO 0)   <= Instruction_2_In(11 DOWNTO 7);
 
                 WHEN "1100011" =>
-                    I2_Funct7 <= "0000000";
-                    I2_Funct3 <= Instruction_2_In(14 DOWNTO 12);
-                    I2_RD     <= "00000";
-                    I2_RS1    <= Instruction_2_In(19 DOWNTO 15);
-                    I2_RS2    <= Instruction_2_In(24 DOWNTO 20);
+                    I2_Control <= "011";
+                    I2_Funct7  <= "0000000";
+                    I2_Funct3  <= Instruction_2_In(14 DOWNTO 12);
+                    I2_RD      <= "00000";
+                    I2_RS1     <= Instruction_2_In(19 DOWNTO 15);
+                    I2_RS2     <= Instruction_2_In(24 DOWNTO 20);
 
                     I2_Imm(31 DOWNTO 12) <= (OTHERS => Instruction_2_In(31));
                     I2_Imm(11)           <= Instruction_2_In(7);
@@ -360,21 +365,23 @@ BEGIN
                     I2_Imm(0)            <= '0';
 
                 WHEN "0110111" | "0010111" =>
-                    I2_Funct7 <= "0000000";
-                    I2_Funct3 <= "000";
-                    I2_RD     <= Instruction_2_In(11 DOWNTO 7);
-                    I2_RS1    <= "00000";
-                    I2_RS2    <= "00000";
+                    I2_Control <= "100";
+                    I2_Funct7  <= "0000000";
+                    I2_Funct3  <= "000";
+                    I2_RD      <= Instruction_2_In(11 DOWNTO 7);
+                    I2_RS1     <= "00000";
+                    I2_RS2     <= "00000";
 
                     I2_Imm(31 DOWNTO 12) <= Instruction_2_In(31 DOWNTO 12);
                     I2_Imm(11 DOWNTO 0)  <= (OTHERS => '0');
 
                 WHEN "1101111" =>
-                    I2_Funct7 <= "0000000";
-                    I2_Funct3 <= "000";
-                    I2_RD     <= Instruction_2_In(11 DOWNTO 7);
-                    I2_RS1    <= "00000";
-                    I2_RS2    <= "00000";
+                    I2_Control <= "100";
+                    I2_Funct7  <= "0000000";
+                    I2_Funct3  <= "000";
+                    I2_RD      <= Instruction_2_In(11 DOWNTO 7);
+                    I2_RS1     <= "00000";
+                    I2_RS2     <= "00000";
 
                     I2_Imm(31 DOWNTO 20) <= (OTHERS => Instruction_2_In(31));
                     I2_Imm(19 DOWNTO 12) <= Instruction_2_In(19 DOWNTO 12);
@@ -383,13 +390,14 @@ BEGIN
                     I2_Imm(0)            <= '0';
 
                 WHEN OTHERS =>
-                    I2_Funct7 <= "0000000";
-                    I2_Funct3 <= "000";
-                    I2_RD     <= "00000";
-                    I2_RS1    <= "00000";
-                    I2_RS2    <= "00000";
+                    I2_Control <= (OTHERS => '0');
+                    I2_Funct7  <= "0000000";
+                    I2_Funct3  <= "000";
+                    I2_RD      <= "00000";
+                    I2_RS1     <= "00000";
+                    I2_RS2     <= "00000";
 
-                    I2_Imm    <= "00000000000000000000000000000000";
+                    I2_Imm     <= "00000000000000000000000000000000";
             END CASE;
         END IF;
     END PROCESS;
@@ -402,41 +410,44 @@ BEGIN
             CASE Instruction_3_In(6 DOWNTO 0) IS
                 WHEN "0110011" =>
                     I3_Control <= "111";
-                    I3_Funct7 <= Instruction_3_In(31 DOWNTO 25);
-                    I3_Funct3 <= Instruction_3_In(14 DOWNTO 12);
-                    I3_RD     <= Instruction_3_In(11 DOWNTO 7);
-                    I3_RS1    <= Instruction_3_In(19 DOWNTO 15);
-                    I3_RS2    <= Instruction_3_In(24 DOWNTO 20);
+                    I3_Funct7  <= Instruction_3_In(31 DOWNTO 25);
+                    I3_Funct3  <= Instruction_3_In(14 DOWNTO 12);
+                    I3_RD      <= Instruction_3_In(11 DOWNTO 7);
+                    I3_RS1     <= Instruction_3_In(19 DOWNTO 15);
+                    I3_RS2     <= Instruction_3_In(24 DOWNTO 20);
                     
-                    I3_Imm    <= "00000000000000000000000000000000";
+                    I3_Imm     <= "00000000000000000000000000000000";
 
                 WHEN "1100111" | "0000011" | "0010011" =>
-                    I3_Funct7 <= "0000000";
-                    I3_Funct3 <= Instruction_3_In(14 DOWNTO 12);
-                    I3_RD     <= Instruction_3_In(11 DOWNTO 7);
-                    I3_RS1    <= Instruction_3_In(19 DOWNTO 15);
-                    I3_RS2    <= "00000";
+                    I3_Control <= "110";
+                    I3_Funct7  <= "0000000";
+                    I3_Funct3  <= Instruction_3_In(14 DOWNTO 12);
+                    I3_RD      <= Instruction_3_In(11 DOWNTO 7);
+                    I3_RS1     <= Instruction_3_In(19 DOWNTO 15);
+                    I3_RS2     <= "00000";
                     
                     I3_Imm(31 DOWNTO 11) <= (OTHERS => Instruction_3_In(31));
                     I3_Imm(10 DOWNTO 0)  <= Instruction_3_In(30 DOWNTO 20);
 
                 WHEN "0100011" =>
-                    I3_Funct7 <= "0000000";
-                    I3_Funct3 <= Instruction_3_In(14 DOWNTO 12);
-                    I3_RD     <= "00000";
-                    I3_RS1    <= Instruction_3_In(19 DOWNTO 15);
-                    I3_RS2    <= Instruction_3_In(24 DOWNTO 20);
+                    I3_Control <= "011";
+                    I3_Funct7  <= "0000000";
+                    I3_Funct3  <= Instruction_3_In(14 DOWNTO 12);
+                    I3_RD      <= "00000";
+                    I3_RS1     <= Instruction_3_In(19 DOWNTO 15);
+                    I3_RS2     <= Instruction_3_In(24 DOWNTO 20);
                     
                     I3_Imm(31 DOWNTO 11) <= (OTHERS => Instruction_3_In(31));
                     I3_Imm(10 DOWNTO 5)  <= Instruction_3_In(30 DOWNTO 25);
                     I3_Imm(4 DOWNTO 0)   <= Instruction_3_In(11 DOWNTO 7);
 
                 WHEN "1100011" =>
-                    I3_Funct7 <= "0000000";
-                    I3_Funct3 <= Instruction_3_In(14 DOWNTO 12);
-                    I3_RD     <= "00000";
-                    I3_RS1    <= Instruction_3_In(19 DOWNTO 15);
-                    I3_RS2    <= Instruction_3_In(24 DOWNTO 20);
+                    I3_Control <= "011";
+                    I3_Funct7  <= "0000000";
+                    I3_Funct3  <= Instruction_3_In(14 DOWNTO 12);
+                    I3_RD      <= "00000";
+                    I3_RS1     <= Instruction_3_In(19 DOWNTO 15);
+                    I3_RS2     <= Instruction_3_In(24 DOWNTO 20);
                     
                     I3_Imm(31 DOWNTO 12) <= (OTHERS => Instruction_3_In(31));
                     I3_Imm(11)           <= Instruction_3_In(7);
@@ -445,21 +456,23 @@ BEGIN
                     I3_Imm(0)            <= '0';
 
                 WHEN "0110111" | "0010111" =>
-                    I3_Funct7 <= "0000000";
-                    I3_Funct3 <= "000";
-                    I3_RD     <= Instruction_3_In(11 DOWNTO 7);
-                    I3_RS1    <= "00000";
-                    I3_RS2    <= "00000";
+                    I3_Control <= "100";
+                    I3_Funct7  <= "0000000";
+                    I3_Funct3  <= "000";
+                    I3_RD      <= Instruction_3_In(11 DOWNTO 7);
+                    I3_RS1     <= "00000";
+                    I3_RS2     <= "00000";
                     
                     I3_Imm(31 DOWNTO 12) <= Instruction_3_In(31 DOWNTO 12);
                     I3_Imm(11 DOWNTO 0)  <= (OTHERS => '0');
 
                 WHEN "1101111" =>
-                    I3_Funct7 <= "0000000";
-                    I3_Funct3 <= "000";
-                    I3_RD     <= Instruction_3_In(11 DOWNTO 7);
-                    I3_RS1    <= "00000";
-                    I3_RS2    <= "00000";
+                    I3_Control <= "100";
+                    I3_Funct7  <= "0000000";
+                    I3_Funct3  <= "000";
+                    I3_RD      <= Instruction_3_In(11 DOWNTO 7);
+                    I3_RS1     <= "00000";
+                    I3_RS2     <= "00000";
                     
                     I3_Imm(31 DOWNTO 20) <= (OTHERS => Instruction_3_In(31));
                     I3_Imm(19 DOWNTO 12) <= Instruction_3_In(19 DOWNTO 12);
@@ -468,13 +481,14 @@ BEGIN
                     I3_Imm(0)            <= '0';
 
                 WHEN OTHERS =>
-                    I3_Funct7 <= "0000000";
-                    I3_Funct3 <= "000";
-                    I3_RD     <= "00000";
-                    I3_RS1    <= "00000";
-                    I3_RS2    <= "00000";
+                    I3_Control <= (OTHERS => '0');
+                    I3_Funct7  <= "0000000";
+                    I3_Funct3  <= "000";
+                    I3_RD      <= "00000";
+                    I3_RS1     <= "00000";
+                    I3_RS2     <= "00000";
                     
-                    I3_Imm    <= "00000000000000000000000000000000";
+                    I3_Imm     <= "00000000000000000000000000000000";
             END CASE;
         END IF;
     END PROCESS;

@@ -26,6 +26,8 @@ ARCHITECTURE processor OF RiscV_Processor IS
     COMPONENT DecoderUnit
         PORT(
             Clock               :  IN STD_LOGIC;
+            Reset               :  IN STD_LOGIC;
+            
             Instruction_0_In    :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Instruction_1_In    :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Instruction_2_In    :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
