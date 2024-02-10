@@ -20,17 +20,36 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit_IssueSelector IS
         );
     END COMPONENT ReservationStationUnit_IssueSelector;
 
-    SIGNAL READY_VECTOR_TB                       : STD_LOGIC_VECTOR(3 DOWNTO 0)                  := (OTHERS => '0');
+    SIGNAL CLOCK_PERIOD                         : TIME                                          := 5 ns;
+    SIGNAL CYCLE_COUNT                          : INTEGER                                       := 0;
+    SIGNAL CLOCK_TB                             : STD_LOGIC                                     := '0';
 
-    SIGNAL RSU_ENTRY_0_TB                        : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
-    SIGNAL RSU_ENTRY_1_TB                        : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
-    SIGNAL RSU_ENTRY_2_TB                        : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
-    SIGNAL RSU_ENTRY_3_TB                        : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
+    SIGNAL READY_VECTOR_TB                      : STD_LOGIC_VECTOR(3 DOWNTO 0)                  := (OTHERS => '0');
 
-    SIGNAL RSU_ENTRY_INDEX_TB                    : STD_LOGIC_VECTOR(1 DOWNTO 0)                  := (OTHERS => '0');
-    SIGNAL RSU_ENTRY_SELECTED_TB                 : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
+    SIGNAL RSU_ENTRY_0_TB                       : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
+    SIGNAL RSU_ENTRY_1_TB                       : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
+    SIGNAL RSU_ENTRY_2_TB                       : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
+    SIGNAL RSU_ENTRY_3_TB                       : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
+
+    SIGNAL RSU_ENTRY_INDEX_TB                   : STD_LOGIC_VECTOR(1 DOWNTO 0)                  := (OTHERS => '0');
+    SIGNAL RSU_ENTRY_SELECTED_TB                : STD_LOGIC_VECTOR(67 DOWNTO 0)                 := (OTHERS => '0');
 
 BEGIN
+
+    -- Controls the Clock signal
+    Clock_Process : PROCESS
+    BEGIN
+        CLOCK_TB <= '0';
+        WAIT FOR CLOCK_PERIOD/2;
+        CLOCK_TB <= '1';
+        CYCLE_COUNT <= CYCLE_COUNT + 1;
+        WAIT FOR CLOCK_PERIOD/2;
+
+        IF (CYCLE_COUNT = 5) THEN
+            REPORT "END OF TESTBENCH" SEVERITY FAILURE;
+        END IF;
+    END PROCESS Clock_Process;
+
 
     -- DUT Instantiation
     RSU_EF : ReservationStationUnit_IssueSelector
@@ -90,7 +109,6 @@ BEGIN
         WAIT FOR 5 ns;
 
 
-        REPORT "END OF TESTBENCH" SEVERITY FAILURE;
         WAIT;
     END PROCESS Stimulus_Process;
 
@@ -102,36 +120,60 @@ BEGIN
         --                             Instant 1                             --
         -- Testing: No instructions ready;
         WAIT FOR 5 ns;
-        ASSERT (RSU_ENTRY_INDEX_TB = "00") REPORT "Instant 1 - Unexpected value of RSU_Entry_Index" SEVERITY FAILURE;
-        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000000") REPORT "Instant 1 - Unexpected value of RSU_Entry_Selected" SEVERITY FAILURE;
+        ASSERT (CYCLE_COUNT = 1)                REPORT "Instant 1 - Unexpected value on Cycle_Count"                SEVERITY FAILURE;
+
+        ASSERT (RSU_ENTRY_INDEX_TB = "00")      REPORT "Instant 1 - Unexpected value of RSU_Entry_Index"            SEVERITY FAILURE;
+        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000000") 
+                                                REPORT "Instant 1 - Unexpected value of RSU_Entry_Selected"         SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 1)               REPORT "Instant 1 - Finishing tests"                                SEVERITY NOTE;
 
 
         --                             Instant 2                             --
         -- Testing: Instruction 0 ready;
         WAIT FOR 5 ns;
-        ASSERT (RSU_ENTRY_INDEX_TB = "00") REPORT "Instant 2 - Unexpected value of RSU_Entry_Index" SEVERITY FAILURE;
-        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") REPORT "Instant 2 - Unexpected value of RSU_Entry_Selected" SEVERITY FAILURE;
+        ASSERT (CYCLE_COUNT = 2)                REPORT "Instant 2 - Unexpected value on Cycle_Count"                SEVERITY FAILURE;
 
+        ASSERT (RSU_ENTRY_INDEX_TB = "00")      REPORT "Instant 2 - Unexpected value of RSU_Entry_Index"            SEVERITY FAILURE;
+        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") 
+                                                REPORT "Instant 2 - Unexpected value of RSU_Entry_Selected"         SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 2)               REPORT "Instant 2 - Finishing tests"                                SEVERITY NOTE;
 
         --                             Instant 3                             --
         -- Testing: Instructions 2 and 3 ready;
         WAIT FOR 5 ns;
-        ASSERT (RSU_ENTRY_INDEX_TB = "10") REPORT "Instant 3 - Unexpected value of RSU_Entry_Index" SEVERITY FAILURE;
-        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") REPORT "Instant 3 - Unexpected value of RSU_Entry_Selected" SEVERITY FAILURE;
+        ASSERT (CYCLE_COUNT = 3)                REPORT "Instant 3 - Unexpected value on Cycle_Count"                SEVERITY FAILURE;
+
+        ASSERT (RSU_ENTRY_INDEX_TB = "10")      REPORT "Instant 3 - Unexpected value of RSU_Entry_Index"            SEVERITY FAILURE;
+        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") 
+                                                REPORT "Instant 3 - Unexpected value of RSU_Entry_Selected"         SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 3)               REPORT "Instant 3 - Finishing tests"                                SEVERITY NOTE;
 
 
         --                             Instant 4                             --
         -- Testing: Instructions 0, 1 and 2 ready;
         WAIT FOR 5 ns;
-        ASSERT (RSU_ENTRY_INDEX_TB = "00") REPORT "Instant 4 - Unexpected value of RSU_Entry_Index" SEVERITY FAILURE;
-        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") REPORT "Instant 4 - Unexpected value of RSU_Entry_Selected" SEVERITY FAILURE;
+        ASSERT (CYCLE_COUNT = 4)                REPORT "Instant 4 - Unexpected value on Cycle_Count"                SEVERITY FAILURE;
+
+        ASSERT (RSU_ENTRY_INDEX_TB = "00")      REPORT "Instant 4 - Unexpected value of RSU_Entry_Index"            SEVERITY FAILURE;
+        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") 
+                                                REPORT "Instant 4 - Unexpected value of RSU_Entry_Selected"         SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 4)               REPORT "Instant 4 - Finishing tests"                                SEVERITY NOTE;
 
 
         --                             Instant 5                             --
         -- Testing: All instructions ready;
         WAIT FOR 5 ns;
-        ASSERT (RSU_ENTRY_INDEX_TB = "00") REPORT "Instant 5 - Unexpected value of RSU_Entry_Index" SEVERITY FAILURE;
-        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") REPORT "Instant 5 - Unexpected value of RSU_Entry_Selected" SEVERITY FAILURE;
+        ASSERT (CYCLE_COUNT = 5)                REPORT "Instant 5 - Unexpected value on Cycle_Count"                SEVERITY FAILURE;
+
+        ASSERT (RSU_ENTRY_INDEX_TB = "00")      REPORT "Instant 5 - Unexpected value of RSU_Entry_Index"            SEVERITY FAILURE;
+        ASSERT (RSU_ENTRY_SELECTED_TB = "00000000000000000000000000000000000000000000000000000000000000000001") 
+                                                REPORT "Instant 5 - Unexpected value of RSU_Entry_Selected"         SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 5)               REPORT "Instant 5 - Finishing tests"                                SEVERITY NOTE;
 
 
         WAIT FOR 5 ns;

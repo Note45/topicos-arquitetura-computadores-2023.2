@@ -147,6 +147,7 @@ BEGIN
     BEGIN
 
         --                             Cycle 1                             --
+        --                            0 to 5 ns
         -- Testing: Multiple instructions arriving at same cycle;
         -- Testing: Instruction with no operands (Inst_2);
         -- Testing: Instruction with both operands (Inst_3);
@@ -177,6 +178,7 @@ BEGIN
 
 
         --                             Cycle 2                             --
+        --                            5 to 10 ns
         -- Testing: Updating operands of an entry with data coming from Functional Units;
         --
         -- Arguments of Instruction_0: OR x28, x7, x0
@@ -203,6 +205,7 @@ BEGIN
 
 
         --                             Cycle 3                             --
+        --                           10 to 15 ns
         -- Testing: Issuing of Instruction_3 from Cycle 1;
         --
         -- Arguments of Instruction_1: SLT x12, x10, x11
@@ -224,49 +227,124 @@ BEGIN
         INSTRUCTION_0_TB <= "00000000000000000000000000000000";
         WAIT FOR 2.6 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        ASSERT (CYCLE_COUNT = 3 AND FU_OPERAND_S_TB = "00000000000000000000000000011010") REPORT "Test 1 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
-        ASSERT (CYCLE_COUNT = 3 AND FU_OPERAND_T_TB = "00000000000000000000000000011111") REPORT "Test 1 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
-        REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         --                             Cycle 4                             --
+        --                           15 to 20 ns
         -- Testing: Issuing of Instruction_2 from Cycle 1;
         INSTRUCTION_1_TB <= "00000000000000000000000000000000";
         WAIT FOR 2.6 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        ASSERT (CYCLE_COUNT = 4 AND FU_OPERAND_S_TB = "00000000000000000000000000010001") REPORT "Test 2 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
-        ASSERT (CYCLE_COUNT = 4 AND FU_OPERAND_T_TB = "00000000000000000000000000010100") REPORT "Test 2 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
-        REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         --                             Cycle 5                             --
+        --                           20 to 25 ns
         -- Testing: Multiple instructions on RSU ready to issue (Inst_2 from Cycle 2 and Inst_1 from Cycle 1);
         -- Testing: Issuing of the first instruction ready on the RSU (LSB to MSB) 
         -- Testing: Issuing of Instruction_0 from Cycle 2;
         WAIT FOR 2.6 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        ASSERT (CYCLE_COUNT = 5 AND FU_OPERAND_S_TB = "00000000000000000000000101010101") REPORT "Test 3 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
-        ASSERT (CYCLE_COUNT = 5 AND FU_OPERAND_T_TB = "00000000000000000000000000100101") REPORT "Test 3 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
-        REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         --                             Cycle 6                            --
+        --                           25 to 30 ns
         -- Testing: Issuing of Instruction_1 from Cycle 3;
         WAIT FOR 2.6 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        ASSERT (CYCLE_COUNT = 6 AND FU_OPERAND_S_TB = "11111111111111111111111111111111") REPORT "Test 4 - Unexpected value on FU_OPERAND_S_TB" SEVERITY FAILURE;
-        ASSERT (CYCLE_COUNT = 6 AND FU_OPERAND_T_TB = "11111111111111111111111111111111") REPORT "Test 4 - Unexpected value on FU_OPERAND_T_TB" SEVERITY FAILURE;
-        REPORT("CYCLE_COUNT: " & integer'image(CYCLE_COUNT) & "; FU_OPERAND_S: " & integer'image(to_integer(signed(FU_OPERAND_S_TB))) & "; FU_OPERAND_T: " & integer'image(to_integer(signed(FU_OPERAND_T_TB))));
         WAIT FOR 2.4 ns;
         FUNCTIONAL_UNIT_BUSY_TB <= '0';
 
 
         WAIT;
-    END PROCESS;
+    END PROCESS Stimulus_Process;
+
+
+    -- Test verification process
+    Output_Process : PROCESS
+    BEGIN
+
+        --                             Cycle 1                             --
+        --                            0 to 5 ns
+        WAIT FOR 5 ns;
+        ASSERT (CYCLE_COUNT = 1)                                        REPORT "Cycle 1 - Unexpected value on Cycle_Count"          SEVERITY FAILURE;
+
+        ASSERT (FU_OPERAND_S_TB = "00000000000000000000000000000000")   REPORT "Cycle 1 - Unexpected value on FU_OPERAND_S_TB"      SEVERITY FAILURE;
+        ASSERT (FU_OPERAND_T_TB = "00000000000000000000000000000000")   REPORT "Cycle 1 - Unexpected value on FU_OPERAND_T_TB"      SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 1)                                       REPORT "Cycle 1 - Finishing tests"                          SEVERITY NOTE;
+
+
+        --                             Cycle 2                             --
+        --                            5 to 10 ns
+        WAIT FOR 5 ns;
+        ASSERT (CYCLE_COUNT = 2)                                        REPORT "Cycle 2 - Unexpected value on Cycle_Count"          SEVERITY FAILURE;
+
+        ASSERT (FU_OPERAND_S_TB = "00000000000000000000000000000000")   REPORT "Cycle 2 - Unexpected value on FU_OPERAND_S_TB"      SEVERITY FAILURE;
+        ASSERT (FU_OPERAND_T_TB = "00000000000000000000000000000000")   REPORT "Cycle 2 - Unexpected value on FU_OPERAND_T_TB"      SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 2)                                       REPORT "Cycle 2 - Finishing tests"                          SEVERITY NOTE;
+
+
+        --                             Cycle 3                             --
+        --                           10 to 15 ns
+        -- Testing: Issuing of Instruction_3 from Cycle 1;
+        WAIT FOR 2.6 ns;
+        ASSERT (CYCLE_COUNT = 3)                                        REPORT "Cycle 3 - Unexpected value on Cycle_Count"          SEVERITY FAILURE;
+
+        ASSERT (FU_OPERAND_S_TB = "00000000000000000000000000011010")   REPORT "Cycle 3 - Unexpected value on FU_OPERAND_S_TB"      SEVERITY FAILURE;
+        ASSERT (FU_OPERAND_T_TB = "00000000000000000000000000011111")   REPORT "Cycle 3 - Unexpected value on FU_OPERAND_T_TB"      SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 3)                                       REPORT "Cycle 3 - Finishing tests"                          SEVERITY NOTE;
+        WAIT FOR 2.4 ns;
+
+
+        --                             Cycle 4                             --
+        --                           15 to 20 ns
+        -- Testing: Issuing of Instruction_2 from Cycle 1;
+        WAIT FOR 2.6 ns;
+        ASSERT (CYCLE_COUNT = 4)                                        REPORT "Cycle 4 - Unexpected value on Cycle_Count"          SEVERITY FAILURE;
+
+        ASSERT (FU_OPERAND_S_TB = "00000000000000000000000000010001")   REPORT "Cycle 4 - Unexpected value on FU_OPERAND_S_TB"      SEVERITY FAILURE;
+        ASSERT (FU_OPERAND_T_TB = "00000000000000000000000000010100")   REPORT "Cycle 4 - Unexpected value on FU_OPERAND_T_TB"      SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 4)                                       REPORT "Cycle 4 - Finishing tests"                          SEVERITY NOTE;
+        WAIT FOR 2.4 ns;
+
+
+        --                             Cycle 5                             --
+        --                           20 to 25 ns
+        -- Testing: Multiple instructions on RSU ready to issue (Inst_2 from Cycle 2 and Inst_1 from Cycle 1);
+        -- Testing: Issuing of the first instruction ready on the RSU (LSB to MSB) 
+        -- Testing: Issuing of Instruction_0 from Cycle 2;
+        WAIT FOR 2.6 ns;
+        ASSERT (CYCLE_COUNT = 5)                                        REPORT "Cycle 5 - Unexpected value on Cycle_Count"          SEVERITY FAILURE;
+
+        ASSERT (FU_OPERAND_S_TB = "00000000000000000000000101010101")   REPORT "Cycle 5 - Unexpected value on FU_OPERAND_S_TB"      SEVERITY FAILURE;
+        ASSERT (FU_OPERAND_T_TB = "00000000000000000000000000100101")   REPORT "Cycle 5 - Unexpected value on FU_OPERAND_T_TB"      SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 5)                                       REPORT "Cycle 5 - Finishing tests"                          SEVERITY NOTE;
+        WAIT FOR 2.4 ns;
+
+
+        --                             Cycle 6                             --
+        --                           25 to 30 ns
+        -- Testing: Issuing of Instruction_1 from Cycle 3;
+        WAIT FOR 2.6 ns;
+        ASSERT (CYCLE_COUNT = 6)                                        REPORT "Cycle 6 - Unexpected value on Cycle_Count"          SEVERITY FAILURE;
+
+        ASSERT (FU_OPERAND_S_TB = "11111111111111111111111111111111")   REPORT "Cycle 6 - Unexpected value on FU_OPERAND_S_TB"      SEVERITY FAILURE;
+        ASSERT (FU_OPERAND_T_TB = "11111111111111111111111111111111")   REPORT "Cycle 6 - Unexpected value on FU_OPERAND_T_TB"      SEVERITY FAILURE;
+
+        ASSERT (CYCLE_COUNT /= 6)                                       REPORT "Cycle 6 - Finishing tests"                          SEVERITY NOTE;
+        WAIT FOR 2.4 ns;
+
+
+        WAIT;
+    END PROCESS Output_Process;
 END ARCHITECTURE testbench;
