@@ -380,7 +380,6 @@ BEGIN
         --        RS1: 01001
         --        RS2: 10001
         --  Immediate: 00000000000000000000000000000000
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 1)                                        REPORT "Cycle 1 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -458,7 +457,6 @@ BEGIN
         --        RS1: 01011
         --        RS2: 01101
         --  Immediate: 00000000000000000000000000000000
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 2)                                        REPORT "Cycle 2 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -536,7 +534,6 @@ BEGIN
         --        RS1: 00100
         --        RS2: 11000
         --  Immediate: 00000000000000000000000000000000
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 3)                                        REPORT "Cycle 3 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -614,7 +611,6 @@ BEGIN
         --        RS1: 11111
         --        RS2: 11001
         --  Immediate: 00000000000000000000000000000000
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 4)                                        REPORT "Cycle 4 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -692,7 +688,6 @@ BEGIN
         --        RS1: 11100
         --        RS2: xxxxx
         --  Immediate: 11111111111111111111101111110110
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 5)                                        REPORT "Cycle 5 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -770,7 +765,6 @@ BEGIN
         --        RS1: 11010
         --        RS2: xxxxx
         --  Immediate: 11111111111111111111111101111111
-        
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 6)                                        REPORT "Cycle 6 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -848,7 +842,6 @@ BEGIN
         --        RS1: 00000
         --        RS2: xxxxx
         --  Immediate: 11111111111111111111100110010011
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 7)                                        REPORT "Cycle 7 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -926,7 +919,6 @@ BEGIN
         --        RS1: 00110
         --        RS2: xxxxx
         --  Immediate: 00000000000000000000000000001001
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 8)                                        REPORT "Cycle 8 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -1004,7 +996,6 @@ BEGIN
         --        RS1: 00100
         --        RS2: 00000
         --  Immediate: 11111111111111111111101011100101
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 9)                                        REPORT "Cycle 9 - Unexpected value on Cycle_Count"        SEVERITY FAILURE;
 
@@ -1082,7 +1073,6 @@ BEGIN
         --        RS1: 11010
         --        RS2: 01111
         --  Immediate: 00000000000000000000000101001000
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 10)                                       REPORT "Cycle 10 - Unexpected value on Cycle_Count"       SEVERITY FAILURE;
 
@@ -1160,7 +1150,6 @@ BEGIN
         --        RS1: xxxxx
         --        RS2: xxxxx
         --  Immediate: 00000101100101011010000000000000
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 11)                                       REPORT "Cycle 11 - Unexpected value on Cycle_Count"       SEVERITY FAILURE;
 
@@ -1220,7 +1209,6 @@ BEGIN
         --        RS1: xxxxx
         --        RS2: xxxxx
         --  Immediate: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
         WAIT FOR 5 ns;
         ASSERT (CYCLE_COUNT = 12)                                       REPORT "Cycle 12 - Unexpected value on Cycle_Count"       SEVERITY FAILURE;
 
