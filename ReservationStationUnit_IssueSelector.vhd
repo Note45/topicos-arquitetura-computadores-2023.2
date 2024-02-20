@@ -6,13 +6,13 @@ ENTITY ReservationStationUnit_IssueSelector IS
     PORT(
         Ready_Vector            :  IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 
-        RSU_Entry_0             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
-        RSU_Entry_1             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
-        RSU_Entry_2             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
-        RSU_Entry_3             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
+        RSU_Entry_0             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
+        RSU_Entry_1             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
+        RSU_Entry_2             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
+        RSU_Entry_3             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
 
         RSU_Entry_Index         : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-        RSU_Entry_Selected      : OUT STD_LOGIC_VECTOR(67 DOWNTO 0)
+        RSU_Entry_Selected      : OUT STD_LOGIC_VECTOR(75 DOWNTO 0)
     );
 END ENTITY ReservationStationUnit_IssueSelector;
 

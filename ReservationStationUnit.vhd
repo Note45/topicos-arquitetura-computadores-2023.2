@@ -7,30 +7,36 @@ ENTITY ReservationStationUnit IS
         Clock                           :  IN STD_LOGIC;
         Reset                           :  IN STD_LOGIC;
 
-        Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
-
         Integer_FU_Bus_Write_On_RRF     :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
         Multiplier_FU_Bus_Write_On_RRF  :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
         
         Instruction_0                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        Inst_0_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        Inst_0_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
         Inst_0_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_0_Valid_S                  :  IN STD_LOGIC;
         Inst_0_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_0_Valid_T                  :  IN STD_LOGIC;
 
         Instruction_1                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        Inst_1_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        Inst_1_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
         Inst_1_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_1_Valid_S                  :  IN STD_LOGIC;
         Inst_1_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_1_Valid_T                  :  IN STD_LOGIC;
 
         Instruction_2                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        Inst_2_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        Inst_2_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
         Inst_2_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_2_Valid_S                  :  IN STD_LOGIC;
         Inst_2_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_2_Valid_T                  :  IN STD_LOGIC;
 
         Instruction_3                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        Inst_3_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+        Inst_3_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
         Inst_3_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         Inst_3_Valid_S                  :  IN STD_LOGIC;
         Inst_3_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -44,8 +50,8 @@ END ENTITY ReservationStationUnit;
 
 ARCHITECTURE behavior OF ReservationStationUnit IS
 
-    TYPE BANK_INST IS ARRAY(0 TO 3) OF STD_LOGIC_VECTOR(67 DOWNTO 0); -- RSU_BUSY(67) & RSU_OPERAND_1(66 DOWNTO 35) & RSU_OPERAND_1_VALID(34) & RSU_OPERAND_2(33 DOWNTO 2) & RSU_OPERAND_2_VALID(1) & RSU_READY(0)
-    SIGNAL RSU : BANK_INST := (OTHERS => "00000000000000000000000000000000000000000000000000000000000000000000");
+    TYPE BANK_INST IS ARRAY(0 TO 3) OF STD_LOGIC_VECTOR(75 DOWNTO 0); -- RSU_BUSY(75) & RSU_FUNCT_3(74 DOWNTO 72) & RSU_OPERAND_DEST(71 DOWNTO 67) & RSU_OPERAND_1(66 DOWNTO 35) & RSU_OPERAND_1_VALID(34) & RSU_OPERAND_2(33 DOWNTO 2) & RSU_OPERAND_2_VALID(1) & RSU_READY(0)
+    SIGNAL RSU : BANK_INST := (OTHERS => "0000000000000000000000000000000000000000000000000000000000000000000000000000");
 
     SIGNAL FunctionalUnit_S : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000000000000000";
     SIGNAL FunctionalUnit_T : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000000000000000";
@@ -75,26 +81,26 @@ ARCHITECTURE behavior OF ReservationStationUnit IS
         PORT(
             Ready_Vector            :  IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 
-            RSU_Entry_0             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
-            RSU_Entry_1             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
-            RSU_Entry_2             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
-            RSU_Entry_3             :  IN STD_LOGIC_VECTOR(67 DOWNTO 0);
+            RSU_Entry_0             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
+            RSU_Entry_1             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
+            RSU_Entry_2             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
+            RSU_Entry_3             :  IN STD_LOGIC_VECTOR(75 DOWNTO 0);
 
             RSU_Entry_Index         : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-            RSU_Entry_Selected      : OUT STD_LOGIC_VECTOR(67 DOWNTO 0)
+            RSU_Entry_Selected      : OUT STD_LOGIC_VECTOR(75 DOWNTO 0)
         );
     END COMPONENT ReservationStationUnit_IssueSelector;
 
     SIGNAL Ready_RSU            : STD_LOGIC_VECTOR(3 DOWNTO 0)  := "0000";
     SIGNAL Selected_RSU_Index   : STD_LOGIC_VECTOR(1 DOWNTO 0)  := "00";
-    SIGNAL Selected_RSU_Entry   : STD_LOGIC_VECTOR(67 DOWNTO 0) := "00000000000000000000000000000000000000000000000000000000000000000000";
+    SIGNAL Selected_RSU_Entry   : STD_LOGIC_VECTOR(75 DOWNTO 0) := "0000000000000000000000000000000000000000000000000000000000000000000000000000";
 
 
 
 BEGIN
 
     -- Maps free entries on the RSU for each possible instruction coming from the dispatcher
-    Busy_RSU <= RSU(3)(67) & RSU(2)(67) & RSU(1)(67) & RSU(0)(67);
+    Busy_RSU <= RSU(3)(75) & RSU(2)(75) & RSU(1)(75) & RSU(0)(75);
 
     RSU_Entry_Finder : ReservationStationUnit_EntryFinder
     PORT MAP(
@@ -125,7 +131,7 @@ BEGIN
 
 
     -- Returns to Dispatcher the state of the RSU buffer
-    RSU_Buffer_State <= RSU(3)(67) & RSU(2)(67) & RSU(1)(67) & RSU(0)(67);
+    RSU_Buffer_State <= RSU(3)(75) & RSU(2)(75) & RSU(1)(75) & RSU(0)(75);
 
     -- Dispatching of upcoming instructions on the Reservation Station
     FU_Operand_S <= FunctionalUnit_S;
@@ -135,7 +141,7 @@ BEGIN
     BEGIN
 
         IF (Reset = '1') THEN
-            RSU <= (OTHERS => "00000000000000000000000000000000000000000000000000000000000000000000");
+            RSU <= (OTHERS => "0000000000000000000000000000000000000000000000000000000000000000000000000000");
 
         ELSIF (Rising_edge(Clock)) THEN
 
@@ -163,7 +169,9 @@ BEGIN
                     --     If Valid_T is 0, RSU_OPERAND_2_VALID is 1
                     --
                     --   Set RSU_READY bit if both RSU_OPERAND_VALID are also set
-                    RSU(to_integer(unsigned(Entry_0_RSU(1 DOWNTO 0))))(67) <= '1';
+                    RSU(to_integer(unsigned(Entry_0_RSU(1 DOWNTO 0))))(75) <= '1';
+                    RSU(to_integer(unsigned(Entry_0_RSU(1 DOWNTO 0))))(74 DOWNTO 72) <= Inst_0_Funct3;
+                    RSU(to_integer(unsigned(Entry_0_RSU(1 DOWNTO 0))))(71 DOWNTO 67) <= Inst_0_RRF_Dest;
                     RSU(to_integer(unsigned(Entry_0_RSU(1 DOWNTO 0))))(66 DOWNTO 35) <= Inst_0_Side_S;
                     RSU(to_integer(unsigned(Entry_0_RSU(1 DOWNTO 0))))(34) <= NOT Inst_0_Valid_S;
                     RSU(to_integer(unsigned(Entry_0_RSU(1 DOWNTO 0))))(33 DOWNTO 2) <= Inst_0_Side_T;
@@ -175,7 +183,9 @@ BEGIN
 
             IF (Instruction_1 /= "00000000000000000000000000000000") THEN
                 IF (Entry_1_RSU(2) = '0') THEN
-                    RSU(to_integer(unsigned(Entry_1_RSU(1 DOWNTO 0))))(67) <= '1';
+                    RSU(to_integer(unsigned(Entry_1_RSU(1 DOWNTO 0))))(75) <= '1';
+                    RSU(to_integer(unsigned(Entry_1_RSU(1 DOWNTO 0))))(74 DOWNTO 72) <= Inst_1_Funct3;
+                    RSU(to_integer(unsigned(Entry_1_RSU(1 DOWNTO 0))))(71 DOWNTO 67) <= Inst_1_RRF_Dest;
                     RSU(to_integer(unsigned(Entry_1_RSU(1 DOWNTO 0))))(66 DOWNTO 35) <= Inst_1_Side_S;
                     RSU(to_integer(unsigned(Entry_1_RSU(1 DOWNTO 0))))(34) <= NOT Inst_1_Valid_S;
                     RSU(to_integer(unsigned(Entry_1_RSU(1 DOWNTO 0))))(33 DOWNTO 2) <= Inst_1_Side_T;
@@ -185,7 +195,9 @@ BEGIN
 
             IF (Instruction_2 /= "00000000000000000000000000000000") THEN
                 IF (Entry_2_RSU(2) = '0') THEN
-                    RSU(to_integer(unsigned(Entry_2_RSU(1 DOWNTO 0))))(67) <= '1';
+                    RSU(to_integer(unsigned(Entry_2_RSU(1 DOWNTO 0))))(75) <= '1';
+                    RSU(to_integer(unsigned(Entry_2_RSU(1 DOWNTO 0))))(74 DOWNTO 72) <= Inst_2_Funct3;
+                    RSU(to_integer(unsigned(Entry_2_RSU(1 DOWNTO 0))))(71 DOWNTO 67) <= Inst_2_RRF_Dest;
                     RSU(to_integer(unsigned(Entry_2_RSU(1 DOWNTO 0))))(66 DOWNTO 35) <= Inst_2_Side_S;
                     RSU(to_integer(unsigned(Entry_2_RSU(1 DOWNTO 0))))(34) <= NOT Inst_2_Valid_S;
                     RSU(to_integer(unsigned(Entry_2_RSU(1 DOWNTO 0))))(33 DOWNTO 2) <= Inst_2_Side_T;
@@ -195,7 +207,9 @@ BEGIN
 
             IF (Instruction_3 /= "00000000000000000000000000000000") THEN
                 IF (Entry_3_RSU(2) = '0') THEN
-                    RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(67) <= '1';
+                    RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(75) <= '1';
+                    RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(74 DOWNTO 72) <= Inst_3_Funct3;
+                    RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(71 DOWNTO 67) <= Inst_3_RRF_Dest;
                     RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(66 DOWNTO 35) <= Inst_3_Side_S;
                     RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(34) <= NOT Inst_3_Valid_S;
                     RSU(to_integer(unsigned(Entry_3_RSU(1 DOWNTO 0))))(33 DOWNTO 2) <= Inst_3_Side_T;
@@ -216,7 +230,7 @@ BEGIN
             --------------------------------------------------------------------------------------------------------
 
             -- If the entry 0 of the RSU is occupied
-            IF (RSU(0)(67) = '1') THEN
+            IF (RSU(0)(75) = '1') THEN
 
                 -- If the entry has it's RSU_READY_0 bit not set
                 IF (RSU(0)(0) = '0') THEN
@@ -277,7 +291,7 @@ BEGIN
 
 
             -- If the entry 1 of the RSU is occupied
-            IF (RSU(1)(67) = '1') THEN
+            IF (RSU(1)(75) = '1') THEN
 
                 -- If the entry has it's RSU_READY_1 bit not set
                 IF (RSU(1)(0) = '0') THEN
@@ -317,7 +331,7 @@ BEGIN
 
 
             -- If the entry 2 of the RSU is occupied
-            IF (RSU(2)(67) = '1') THEN
+            IF (RSU(2)(75) = '1') THEN
 
                 -- If the entry has it's RSU_READY_2 bit not set
                 IF (RSU(2)(0) = '0') THEN
@@ -357,7 +371,7 @@ BEGIN
 
 
             -- If the entry 3 of the RSU is occupied
-            IF (RSU(3)(67) = '1') THEN
+            IF (RSU(3)(75) = '1') THEN
 
                 -- If the entry has it's RSU_READY_3 bit not set
                 IF (RSU(3)(0) = '0') THEN
@@ -408,19 +422,14 @@ BEGIN
 
 
 
-            -- If the associated Functional Unit is available
-            IF (Functional_Unit_Busy = '0') THEN
+            -- If the RSU_READY of the first entry of RSU is set (instruction ready for execution)
+            IF (Selected_RSU_Entry(0) = '1') THEN
 
-                -- If the RSU_READY of the first entry of RSU is set (instruction ready for execution)
-                IF (Selected_RSU_Entry(0) = '1') THEN
+                -- Sends the instruction to the respective functional unit linked with the RS, and resets their RSU entry
+                FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
+                FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
+                RSU(to_integer(unsigned((Selected_RSU_Index)))) <= "0000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-                    -- Sends the instruction to the respective functional unit linked with the RS, and resets their RSU entry
-                    FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
-                    FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
-                    RSU(to_integer(unsigned((Selected_RSU_Index)))) <= "00000000000000000000000000000000000000000000000000000000000000000000";
-
-                END IF;
-                
             END IF;
 
 

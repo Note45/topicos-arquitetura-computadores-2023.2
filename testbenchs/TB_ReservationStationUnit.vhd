@@ -11,30 +11,36 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Clock                           :  IN STD_LOGIC;
             Reset                           :  IN STD_LOGIC;
     
-            Functional_Unit_Busy            :  IN STD_LOGIC;                            -- Specifies if the FU associated is available; '0' if true
-    
             Integer_FU_Bus_Write_On_RRF     :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
             Multiplier_FU_Bus_Write_On_RRF  :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
             
             Instruction_0                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_0_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Inst_0_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_0_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_0_Valid_S                  :  IN STD_LOGIC;
             Inst_0_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_0_Valid_T                  :  IN STD_LOGIC;
     
             Instruction_1                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_1_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Inst_1_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_1_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_1_Valid_S                  :  IN STD_LOGIC;
             Inst_1_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_1_Valid_T                  :  IN STD_LOGIC;
     
             Instruction_2                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_2_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Inst_2_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_2_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_2_Valid_S                  :  IN STD_LOGIC;
             Inst_2_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_2_Valid_T                  :  IN STD_LOGIC;
     
             Instruction_3                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_3_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            Inst_3_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_3_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
             Inst_3_Valid_S                  :  IN STD_LOGIC;
             Inst_3_Side_T                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -51,30 +57,36 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL CLOCK_TB                             : STD_LOGIC                             := '0';
     SIGNAL RESET_TB                             : STD_LOGIC                             := '0';
 
-    SIGNAL FUNCTIONAL_UNIT_BUSY_TB              : STD_LOGIC                             := '0';
-
     SIGNAL INTEGER_FU_BUS_WRITE_ON_RRF_TB       : STD_LOGIC_VECTOR(37 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB    : STD_LOGIC_VECTOR(37 DOWNTO 0)         := (OTHERS => '0');
     
     SIGNAL INSTRUCTION_0_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_0_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
+    SIGNAL INST_0_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_0_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_0_VALID_S_TB                    : STD_LOGIC                             := '0';
     SIGNAL INST_0_SIDE_T_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_0_VALID_T_TB                    : STD_LOGIC                             := '0';
     
     SIGNAL INSTRUCTION_1_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_1_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
+    SIGNAL INST_1_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_1_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_1_VALID_S_TB                    : STD_LOGIC                             := '0';
     SIGNAL INST_1_SIDE_T_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_1_VALID_T_TB                    : STD_LOGIC                             := '0';
 
     SIGNAL INSTRUCTION_2_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_2_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
+    SIGNAL INST_2_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_2_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_2_VALID_S_TB                    : STD_LOGIC                             := '0';
     SIGNAL INST_2_SIDE_T_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_2_VALID_T_TB                    : STD_LOGIC                             := '0';
 
     SIGNAL INSTRUCTION_3_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_3_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
+    SIGNAL INST_3_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_3_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL INST_3_VALID_S_TB                    : STD_LOGIC                             := '0';
     SIGNAL INST_3_SIDE_T_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
@@ -107,30 +119,36 @@ BEGIN
         Clock => CLOCK_TB,
         Reset => RESET_TB,
 
-        Functional_Unit_Busy => FUNCTIONAL_UNIT_BUSY_TB,
-
         Integer_FU_Bus_Write_On_RRF => INTEGER_FU_BUS_WRITE_ON_RRF_TB,
         Multiplier_FU_Bus_Write_On_RRF => MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB,
 
         Instruction_0 => INSTRUCTION_0_TB,
+        Inst_0_Funct3 => INST_0_FUNCT3_TB,
+        Inst_0_RRF_Dest => INST_0_RRF_DEST_TB,
         Inst_0_Side_S => INST_0_SIDE_S_TB,
         Inst_0_Valid_S => INST_0_VALID_S_TB,
         Inst_0_Side_T => INST_0_SIDE_T_TB,
         Inst_0_Valid_T => INST_0_VALID_T_TB,
         
         Instruction_1 => INSTRUCTION_1_TB,
+        Inst_1_Funct3 => INST_1_FUNCT3_TB,
+        Inst_1_RRF_Dest => INST_1_RRF_DEST_TB,
         Inst_1_Side_S => INST_1_SIDE_S_TB,
         Inst_1_Valid_S => INST_1_VALID_S_TB,
         Inst_1_Side_T => INST_1_SIDE_T_TB,
         Inst_1_Valid_T => INST_1_VALID_T_TB,
 
         Instruction_2 => INSTRUCTION_2_TB,
+        Inst_2_Funct3 => INST_2_FUNCT3_TB,
+        Inst_2_RRF_Dest => INST_2_RRF_DEST_TB,
         Inst_2_Side_S => INST_2_SIDE_S_TB,
         Inst_2_Valid_S => INST_2_VALID_S_TB,
         Inst_2_Side_T => INST_2_SIDE_T_TB,
         Inst_2_Valid_T => INST_2_VALID_T_TB,
 
         Instruction_3 => INSTRUCTION_3_TB,
+        Inst_3_Funct3 => INST_3_FUNCT3_TB,
+        Inst_3_RRF_Dest => INST_3_RRF_DEST_TB,
         Inst_3_Side_S => INST_3_SIDE_S_TB,
         Inst_3_Valid_S => INST_3_VALID_S_TB,
         Inst_3_Side_T => INST_3_SIDE_T_TB,
@@ -225,20 +243,14 @@ BEGIN
         INST_1_VALID_T_TB <= '0';
 
         INSTRUCTION_0_TB <= "00000000000000000000000000000000";
-        WAIT FOR 2.6 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        WAIT FOR 2.4 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '0';
+        WAIT FOR 5 ns;
 
 
         --                             Cycle 4                             --
         --                           15 to 20 ns
         -- Testing: Issuing of Instruction_2 from Cycle 1;
         INSTRUCTION_1_TB <= "00000000000000000000000000000000";
-        WAIT FOR 2.6 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        WAIT FOR 2.4 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '0';
+        WAIT FOR 5 ns;
 
 
         --                             Cycle 5                             --
@@ -246,19 +258,13 @@ BEGIN
         -- Testing: Multiple instructions on RSU ready to issue (Inst_2 from Cycle 2 and Inst_1 from Cycle 1);
         -- Testing: Issuing of the first instruction ready on the RSU (LSB to MSB) 
         -- Testing: Issuing of Instruction_0 from Cycle 2;
-        WAIT FOR 2.6 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        WAIT FOR 2.4 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '0';
+        WAIT FOR 5 ns;
 
 
         --                             Cycle 6                            --
         --                           25 to 30 ns
         -- Testing: Issuing of Instruction_1 from Cycle 3;
-        WAIT FOR 2.6 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '1';
-        WAIT FOR 2.4 ns;
-        FUNCTIONAL_UNIT_BUSY_TB <= '0';
+        WAIT FOR 5 ns;
 
 
         WAIT;
