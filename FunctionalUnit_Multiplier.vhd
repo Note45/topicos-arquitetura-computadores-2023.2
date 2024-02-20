@@ -4,6 +4,8 @@ USE IEEE.NUMERIC_STD.ALL;
 
 ENTITY FunctionalUnit_Multiplier IS
     PORT(
+        Identifier                  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);             -- Specifies this type of Functional Unit
+
         Funct3                      :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);             -- Specifies the instruction between all of the M module
         RRF_Dest                    :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);             -- Specifies the destination register on RRF
 
@@ -416,6 +418,11 @@ BEGIN
         '1' & RRF_Dest & Operation_Result(63 DOWNTO 32)      WHEN "001",     -- MULH
         '0' & "00000" & "00000000000000000000000000000000"   WHEN OTHERS;
 
+
+
+
+    -- Identifies this type of Functional Unit to the RSU
+    Identifier <= "01";
 
 
 
