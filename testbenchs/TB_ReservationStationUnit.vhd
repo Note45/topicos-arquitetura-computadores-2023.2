@@ -11,6 +11,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Clock                           :  IN STD_LOGIC;
             Reset                           :  IN STD_LOGIC;
     
+            FU_Identifier                   :  IN STD_LOGIC_VECTOR(1 DOWNTO 0);
             Integer_FU_Bus_Write_On_RRF     :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
             Multiplier_FU_Bus_Write_On_RRF  :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
             
@@ -61,6 +62,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL CLOCK_TB                             : STD_LOGIC                             := '0';
     SIGNAL RESET_TB                             : STD_LOGIC                             := '0';
 
+    SIGNAL FU_IDENTIFIER_TB                     : STD_LOGIC_VECTOR(1 DOWNTO 0)          := "00";
     SIGNAL INTEGER_FU_BUS_WRITE_ON_RRF_TB       : STD_LOGIC_VECTOR(37 DOWNTO 0)         := (OTHERS => '0');
     SIGNAL MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB    : STD_LOGIC_VECTOR(37 DOWNTO 0)         := (OTHERS => '0');
     
@@ -127,6 +129,7 @@ BEGIN
         Clock => CLOCK_TB,
         Reset => RESET_TB,
 
+        FU_Identifier => FU_IDENTIFIER_TB,
         Integer_FU_Bus_Write_On_RRF => INTEGER_FU_BUS_WRITE_ON_RRF_TB,
         Multiplier_FU_Bus_Write_On_RRF => MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB,
 

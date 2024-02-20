@@ -7,6 +7,7 @@ ENTITY ReservationStationUnit IS
         Clock                           :  IN STD_LOGIC;
         Reset                           :  IN STD_LOGIC;
 
+        FU_Identifier                   :  IN STD_LOGIC_VECTOR(1 DOWNTO 0);
         Integer_FU_Bus_Write_On_RRF     :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
         Multiplier_FU_Bus_Write_On_RRF  :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
         
@@ -47,6 +48,8 @@ ENTITY ReservationStationUnit IS
         Inst_3_Valid_T                  :  IN STD_LOGIC;
 
         RSU_Buffer_State                : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);         -- RSU_BUSY(3) & RSU_BUSY(2) & RSU_BUSY(1) & RSU_BUSY(0)
+        FU_Funct7                       : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        FU_Funct3                       : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         FU_Operand_S                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         FU_Operand_T                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
@@ -57,6 +60,8 @@ ARCHITECTURE behavior OF ReservationStationUnit IS
     TYPE BANK_INST IS ARRAY(0 TO 3) OF STD_LOGIC_VECTOR(82 DOWNTO 0); -- RSU_BUSY(82) & RSU_FUNCT7(81 DOWNTO 75) & RSU_FUNCT3(74 DOWNTO 72) & RSU_OPERAND_DEST(71 DOWNTO 67) & RSU_OPERAND_1(66 DOWNTO 35) & RSU_OPERAND_1_VALID(34) & RSU_OPERAND_2(33 DOWNTO 2) & RSU_OPERAND_2_VALID(1) & RSU_READY(0)
     SIGNAL RSU : BANK_INST := (OTHERS => "00000000000000000000000000000000000000000000000000000000000000000000000000000000000");
 
+    SIGNAL FunctionalUnit_F7 : STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000000";
+    SIGNAL FunctionalUnit_F3 : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
     SIGNAL FunctionalUnit_S : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000000000000000";
     SIGNAL FunctionalUnit_T : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000000000000000";
 
@@ -138,6 +143,8 @@ BEGIN
     RSU_Buffer_State <= RSU(3)(82) & RSU(2)(82) & RSU(1)(82) & RSU(0)(82);
 
     -- Dispatching of upcoming instructions on the Reservation Station
+    FU_Funct7 <= FunctionalUnit_F7;
+    FU_Funct3 <= FunctionalUnit_F3;
     FU_Operand_S <= FunctionalUnit_S;
     FU_Operand_T <= FunctionalUnit_T;
 
@@ -434,8 +441,19 @@ BEGIN
             IF (Selected_RSU_Entry(0) = '1') THEN
 
                 -- Sends the instruction to the respective functional unit linked with the RS, and resets their RSU entry
-                FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
-                FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
+                IF (FU_Identifier = "00") THEN      -- FU_Integer
+                    FunctionalUnit_F7 <= Selected_RSU_Entry(81 DOWNTO 75);
+                    FunctionalUnit_F3 <= Selected_RSU_Entry(74 DOWNTO 72);
+                    FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
+                    FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
+
+                ELSIF (FU_Identifier = "01") THEN   -- FU_Multiplier
+                    FunctionalUnit_F3 <= Selected_RSU_Entry(74 DOWNTO 72);
+                    FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
+                    FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
+                END IF;
+
+                -- Resets their RSU entry
                 RSU(to_integer(unsigned((Selected_RSU_Index)))) <= "00000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
             END IF;
