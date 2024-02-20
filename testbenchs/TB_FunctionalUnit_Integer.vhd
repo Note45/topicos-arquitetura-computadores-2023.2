@@ -8,6 +8,8 @@ END ENTITY TB_FunctionalUnit_Integer;
 ARCHITECTURE testbench OF TB_FunctionalUnit_Integer IS
     COMPONENT FunctionalUnit_Integer IS
         PORT(
+            Identifier                  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);             -- Specifies this type of Functional Unit
+
             Funct7                      :  IN STD_LOGIC_VECTOR(6 DOWNTO 0);             -- Specifies the instruction
             Funct3                      :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);             -- Specifies the instruction
             RRF_Dest                    :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);             -- Specifies the destination register on RRF
@@ -23,6 +25,7 @@ ARCHITECTURE testbench OF TB_FunctionalUnit_Integer IS
     SIGNAL CYCLE_COUNT                          : INTEGER                               := 0;
     SIGNAL CLOCK_TB                             : STD_LOGIC                             := '0';
 
+    SIGNAL IDENTIFIER_TB                        : STD_LOGIC_VECTOR(1 DOWNTO 0)          := "00";
     SIGNAL FUNCT7_TB                            : STD_LOGIC_VECTOR(6 DOWNTO 0)          := "0000000";
     SIGNAL FUNCT3_TB                            : STD_LOGIC_VECTOR(2 DOWNTO 0)          := "000";
     SIGNAL RRF_DEST_TB                          : STD_LOGIC_VECTOR(4 DOWNTO 0)          := "00000";
@@ -52,6 +55,8 @@ BEGIN
     -- DUT Instantiation
     FU_Int : FunctionalUnit_Integer
     PORT MAP(
+        Identifier => IDENTIFIER_TB,
+
         Funct7 => FUNCT7_TB,
         Funct3 => FUNCT3_TB,
         RRF_Dest => RRF_DEST_TB,
