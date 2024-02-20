@@ -50,6 +50,7 @@ ENTITY ReservationStationUnit IS
         RSU_Buffer_State                : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);         -- RSU_BUSY(3) & RSU_BUSY(2) & RSU_BUSY(1) & RSU_BUSY(0)
         FU_Funct7                       : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
         FU_Funct3                       : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        FU_RRF_Dest                     : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         FU_Operand_S                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         FU_Operand_T                    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
@@ -62,6 +63,7 @@ ARCHITECTURE behavior OF ReservationStationUnit IS
 
     SIGNAL FunctionalUnit_F7 : STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000000";
     SIGNAL FunctionalUnit_F3 : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
+    SIGNAL FunctionalUnit_Dest : STD_LOGIC_VECTOR(4 DOWNTO 0) := "00000";
     SIGNAL FunctionalUnit_S : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000000000000000";
     SIGNAL FunctionalUnit_T : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000000000000000";
 
@@ -145,6 +147,7 @@ BEGIN
     -- Dispatching of upcoming instructions on the Reservation Station
     FU_Funct7 <= FunctionalUnit_F7;
     FU_Funct3 <= FunctionalUnit_F3;
+    FU_RRF_Dest <= FunctionalUnit_Dest;
     FU_Operand_S <= FunctionalUnit_S;
     FU_Operand_T <= FunctionalUnit_T;
 
@@ -444,11 +447,13 @@ BEGIN
                 IF (FU_Identifier = "00") THEN      -- FU_Integer
                     FunctionalUnit_F7 <= Selected_RSU_Entry(81 DOWNTO 75);
                     FunctionalUnit_F3 <= Selected_RSU_Entry(74 DOWNTO 72);
+                    FunctionalUnit_Dest <= Selected_RSU_Entry(71 DOWNTO 67);
                     FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
                     FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
 
                 ELSIF (FU_Identifier = "01") THEN   -- FU_Multiplier
                     FunctionalUnit_F3 <= Selected_RSU_Entry(74 DOWNTO 72);
+                    FunctionalUnit_Dest <= Selected_RSU_Entry(71 DOWNTO 67);
                     FunctionalUnit_S <= Selected_RSU_Entry(66 DOWNTO 35);
                     FunctionalUnit_T <= Selected_RSU_Entry(33 DOWNTO 2);
                 END IF;
