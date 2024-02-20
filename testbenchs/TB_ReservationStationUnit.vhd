@@ -15,6 +15,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Multiplier_FU_Bus_Write_On_RRF  :  IN STD_LOGIC_VECTOR(37 DOWNTO 0);
             
             Instruction_0                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_0_Funct7                   :  IN STD_LOGIC_VECTOR(6 DOWNTO 0);
             Inst_0_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             Inst_0_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_0_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -23,6 +24,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Inst_0_Valid_T                  :  IN STD_LOGIC;
     
             Instruction_1                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_1_Funct7                   :  IN STD_LOGIC_VECTOR(6 DOWNTO 0);
             Inst_1_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             Inst_1_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_1_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -31,6 +33,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Inst_1_Valid_T                  :  IN STD_LOGIC;
     
             Instruction_2                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_2_Funct7                   :  IN STD_LOGIC_VECTOR(6 DOWNTO 0);
             Inst_2_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             Inst_2_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_2_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -39,6 +42,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
             Inst_2_Valid_T                  :  IN STD_LOGIC;
     
             Instruction_3                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+            Inst_3_Funct7                   :  IN STD_LOGIC_VECTOR(6 DOWNTO 0);
             Inst_3_Funct3                   :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);
             Inst_3_RRF_Dest                 :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);
             Inst_3_Side_S                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -61,6 +65,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB    : STD_LOGIC_VECTOR(37 DOWNTO 0)         := (OTHERS => '0');
     
     SIGNAL INSTRUCTION_0_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_0_FUNCT7_TB                     : STD_LOGIC_VECTOR(6 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_0_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_0_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_0_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
@@ -69,6 +74,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL INST_0_VALID_T_TB                    : STD_LOGIC                             := '0';
     
     SIGNAL INSTRUCTION_1_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_1_FUNCT7_TB                     : STD_LOGIC_VECTOR(6 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_1_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_1_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_1_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
@@ -77,6 +83,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL INST_1_VALID_T_TB                    : STD_LOGIC                             := '0';
 
     SIGNAL INSTRUCTION_2_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_2_FUNCT7_TB                     : STD_LOGIC_VECTOR(6 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_2_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_2_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_2_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
@@ -85,6 +92,7 @@ ARCHITECTURE testbench OF TB_ReservationStationUnit IS
     SIGNAL INST_2_VALID_T_TB                    : STD_LOGIC                             := '0';
 
     SIGNAL INSTRUCTION_3_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
+    SIGNAL INST_3_FUNCT7_TB                     : STD_LOGIC_VECTOR(6 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_3_FUNCT3_TB                     : STD_LOGIC_VECTOR(2 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_3_RRF_DEST_TB                   : STD_LOGIC_VECTOR(4 DOWNTO 0)          := (OTHERS => '0');
     SIGNAL INST_3_SIDE_S_TB                     : STD_LOGIC_VECTOR(31 DOWNTO 0)         := (OTHERS => '0');
@@ -123,6 +131,7 @@ BEGIN
         Multiplier_FU_Bus_Write_On_RRF => MULTIPLIER_FU_BUS_WRITE_ON_RRF_TB,
 
         Instruction_0 => INSTRUCTION_0_TB,
+        Inst_0_Funct7 => INST_0_FUNCT7_TB,
         Inst_0_Funct3 => INST_0_FUNCT3_TB,
         Inst_0_RRF_Dest => INST_0_RRF_DEST_TB,
         Inst_0_Side_S => INST_0_SIDE_S_TB,
@@ -131,6 +140,7 @@ BEGIN
         Inst_0_Valid_T => INST_0_VALID_T_TB,
         
         Instruction_1 => INSTRUCTION_1_TB,
+        Inst_1_Funct7 => INST_1_FUNCT7_TB,
         Inst_1_Funct3 => INST_1_FUNCT3_TB,
         Inst_1_RRF_Dest => INST_1_RRF_DEST_TB,
         Inst_1_Side_S => INST_1_SIDE_S_TB,
@@ -139,6 +149,7 @@ BEGIN
         Inst_1_Valid_T => INST_1_VALID_T_TB,
 
         Instruction_2 => INSTRUCTION_2_TB,
+        Inst_2_Funct7 => INST_2_FUNCT7_TB,
         Inst_2_Funct3 => INST_2_FUNCT3_TB,
         Inst_2_RRF_Dest => INST_2_RRF_DEST_TB,
         Inst_2_Side_S => INST_2_SIDE_S_TB,
@@ -147,6 +158,7 @@ BEGIN
         Inst_2_Valid_T => INST_2_VALID_T_TB,
 
         Instruction_3 => INSTRUCTION_3_TB,
+        Inst_3_Funct7 => INST_3_FUNCT7_TB,
         Inst_3_Funct3 => INST_3_FUNCT3_TB,
         Inst_3_RRF_Dest => INST_3_RRF_DEST_TB,
         Inst_3_Side_S => INST_3_SIDE_S_TB,
