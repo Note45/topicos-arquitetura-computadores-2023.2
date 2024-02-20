@@ -4,15 +4,13 @@ USE IEEE.NUMERIC_STD.ALL;
 
 ENTITY FunctionalUnit_Multiplier IS
     PORT(
-        Clock           :  IN STD_LOGIC;
-        Reset           :  IN STD_LOGIC;
-        FU_Busy         : OUT STD_LOGIC;                                -- '1' if the functional unit is busy with an instruction; '0' otherwise
+        Funct3                      :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);             -- Specifies the instruction between all of the M module
+        RRF_Dest                    :  IN STD_LOGIC_VECTOR(4 DOWNTO 0);             -- Specifies the destination register on RRF
 
-        Funct3          :  IN STD_LOGIC_VECTOR(2 DOWNTO 0);             -- Specifies the instruction between all of the M module
-        Operand_A       :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-        Operand_B       :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        Operand_A                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);            -- Specifies the first value of the operation
+        Operand_B                   :  IN STD_LOGIC_VECTOR(31 DOWNTO 0);            -- Specifies the second value of the operation
 
-        Result          : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+        Result_Bus_Write_On_RRF     : OUT STD_LOGIC_VECTOR(37 DOWNTO 0)             -- VALID_SIGNAL(37) & RRF_DEST(36 DOWNTO 32) & RESULT(31 DOWNTO 0)
     );
 END ENTITY FunctionalUnit_Multiplier;
 
@@ -413,10 +411,10 @@ BEGIN
 
 
     -- Selects the result of the instruction according to it's Funct3 field
-    WITH Funct3 SELECT Result <=
-        Operation_Result(31 DOWNTO 0)       WHEN "000",     -- MUL
-        Operation_Result(63 DOWNTO 32)      WHEN "001",     -- MULH
-        "00000000000000000000000000000000"  WHEN OTHERS;
+    WITH Funct3 SELECT Result_Bus_Write_On_RRF <=
+        '1' & RRF_Dest & Operation_Result(31 DOWNTO 0)       WHEN "000",     -- MUL
+        '1' & RRF_Dest & Operation_Result(63 DOWNTO 32)      WHEN "001",     -- MULH
+        '0' & "00000" & "00000000000000000000000000000000"   WHEN OTHERS;
 
 
 
